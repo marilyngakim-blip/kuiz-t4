@@ -43,6 +43,11 @@ Masa persediaan: kira-kira 30 minit, sekali sahaja.
    (Amaran ini biasa bagi skrip yang anda tulis sendiri.)
 7. Tab **Murid, Kuiz, Input Kuiz, Kunci, Markah, Draf, Import Murid** kini wujud.
 
+> **Menu KUIZ T4 tidak muncul?** Dalam editor Apps Script, pilih fungsi **`sediakanSheet`** di kotak
+> sebelah butang **▷ Run** → **Run** → beri kebenaran seperti di atas. Kemudian muat semula tab Sheet.
+> Jika ada ralat: pastikan kod lengkap (baris terakhir ±1577 ialah `}`), sudah disimpan (Ctrl+S), dan
+> Apps Script dibuka melalui **Extensions → Apps Script** dari Sheet itu sendiri.
+
 ## Langkah 3 – Kata laluan guru
 
 1. Apps Script → **Project Settings** → bahagian bawah **Script properties** → **Add script property**.
