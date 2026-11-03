@@ -26,7 +26,8 @@ Masa persediaan: kira-kira 30 minit, sekali sahaja.
 
 1. Buka <https://sheets.new> (gunakan akaun Google yang akan menjadi "pemilik" sistem).
 2. Namakan Sheet: **Kuiz Matematik T4**.
-3. **File → Settings → Time zone**: pilih **(GMT+08:00) Kuala Lumpur** → Save.
+3. **File → Settings → Time zone**: pilih **(GMT+08:00) Kuala Lumpur**. Jika tiada dalam senarai, pilih
+   mana-mana **GMT+08:00** seperti **Singapore** (waktu sama dengan Malaysia) → Save.
 
 ## Langkah 2 – Tampal kod Apps Script
 
@@ -34,7 +35,8 @@ Masa persediaan: kira-kira 30 minit, sekali sahaja.
 2. Padam semua kod dalam `Code.gs`.
 3. Buka fail [`apps-script/Code.gs`](apps-script/Code.gs) di GitHub → butang **Copy raw file** (ikon salin) →
    tampal ke dalam editor Apps Script → **Save** (ikon disket).
-4. Kiri: **Project Settings** (ikon gear) → **Time zone** = *(GMT+08:00) Kuala Lumpur*.
+4. Kiri: **Project Settings** (ikon gear) → **Time zone** = *(GMT+08:00) Kuala Lumpur* atau *Singapore*
+   (mana-mana GMT+08:00).
 5. Kembali ke tab Sheet dan **muat semula** halaman. Menu **KUIZ T4** muncul (tunggu ±10 saat).
 6. **KUIZ T4 → 1. Sediakan Sheet (kali pertama)**. Google akan meminta kebenaran:
    *Review permissions* → pilih akaun anda → *Advanced* → *Go to … (unsafe)* → **Allow**.
