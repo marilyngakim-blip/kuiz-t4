@@ -370,11 +370,30 @@ function ringkasCubaan_(r) {
   return { attempt: r.attempt, score: r.score, total: r.total, pct: r.pct, time: r.time, at: r.at };
 }
 
+// Rakan sekelas yang belum menjawab setiap kuiz yang dibuka (cache ±60 s; satu bacaan Markah sekelas seminit).
+function belumKelas_(kelas) {
+  return cached_('belum:' + norm_(kelas), () => {
+    const now = Date.now();
+    const ahli = muridAktif_().filter(m => norm_(m.kelas) === norm_(kelas))
+      .sort((a, b) => a.nama.localeCompare(b.nama, 'ms'));
+    const quizzes = kuizAll_().filter(q => untukKelas_(q, kelas) && dibuka_(q, now));
+    if (!quizzes.length) return {};
+    const sudah = {};
+    markahRows_().forEach(r => { sudah[r.quizId + '|' + r.id] = 1; });
+    const out = {};
+    quizzes.forEach(q => {
+      out[q.id] = ahli.filter(m => !sudah[q.id + '|' + m.id]).map(m => [m.id, m.nama]);
+    });
+    return out;
+  });
+}
+
 function home_(req) {
   const m = murid_(req);
   const now = Date.now();
   const mine = markahMurid_(m.id);
   const drafts = drafMurid_(m.id);
+  const belum = belumKelas_(m.kelas);
   const list = kuizAll_().filter(q => untukKelas_(q, m.kelas) && sudahBuka_(q, now) && kunci_(q.id).length);
   const out = list.map(q => {
     const att = mine.filter(r => r.quizId === q.id).sort((a, b) => a.attempt - b.attempt);
@@ -387,7 +406,10 @@ function home_(req) {
       cubaan: q.cubaan, ranking: q.ranking, n: kunci_(q.id).length,
       attempts: att.map(ringkasCubaan_), sedang: sedang && open, open: open,
       bolehMula: open && (sedang || !q.cubaan || att.length < q.cubaan),
-      bolehSemak: att.length > 0 && bolehLihatJawapan_(q, now)
+      bolehSemak: att.length > 0 && bolehLihatJawapan_(q, now),
+      // Nama rakan sekelas yang belum menjawab (tidak termasuk murid ini; tiada IDMurid).
+      rakanBelum: open ? (belum[q.id] || []).filter(x => x[0] !== m.id).map(x => x[1]) : null,
+      jumlahKelas: open ? muridAktif_().filter(x => norm_(x.kelas) === norm_(m.kelas)).length : null
     };
   });
   const buka = out.filter(q => q.open).sort((a, b) => (a.tutup || 9e15) - (b.tutup || 9e15));

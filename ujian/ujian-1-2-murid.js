@@ -40,6 +40,39 @@ const { langkah, selesai, ralatKonsol } = require('./alat');
     await page.screenshot({ path: srv.outDir + '/1-muka-depan.png' });
   });
 
+  await langkah('1a2. Muka depan: senarai murid sekelas yang belum menjawab + salin peringatan', async () => {
+    const card = page.locator('[data-quiz="' + d.quizId + '"]');
+    const sum = card.locator('details.rakan summary');
+    assert.match(await sum.innerText(), /Murid belum menjawab: 4/);
+    await sum.click();
+    const names = await card.locator('details.rakan li').allInnerTexts();
+    assert.deepStrictEqual(names, ['BRYAN LIM WEI JIE', 'DANIAL HAKIMI BIN ROSLAN', 'KAVITHA A/P MURUGAN', 'NUR IMAN BINTI ZULKIFLI']);
+    assert(!names.includes(alia.nama), 'tidak termasuk diri sendiri');
+    assert(!(await card.innerText()).includes('AIDAN'), 'tiada murid kelas lain');
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await card.getByRole('button', { name: /Salin peringatan/ }).click();
+    const clip = await page.evaluate(() => navigator.clipboard.readText());
+    assert.match(clip, /Peringatan kuiz: Matematik Tingkatan 4[\s\S]*Belum menjawab \(4 Bestari\):\n1\. BRYAN LIM WEI JIE/);
+    const tok = JSON.parse(await page.evaluate(() => localStorage.getItem('t4.sesi'))).token;
+    const h = g.post({ action: 'home', token: tok });
+    assert(!JSON.stringify(h).includes('M900'), 'tiada IDMurid dalam respons');
+    // Murid lain menjawab → hilang dari senarai selepas cache (±60 s) tamat
+    const b = g.post({ action: 'login', id: bryan.id, pin: bryan.pin }).token;
+    g.post({ action: 'start', token: b, quizId: d.quizId });
+    g.post({ action: 'submit', token: b, quizId: d.quizId, answers: d.key.map(() => '') });
+    g.advance(61000);
+    const h2 = g.post({ action: 'home', token: tok });
+    assert.deepStrictEqual(h2.buka[0].rakanBelum, ['DANIAL HAKIMI BIN ROSLAN', 'KAVITHA A/P MURUGAN', 'NUR IMAN BINTI ZULKIFLI']);
+    await page.screenshot({ path: srv.outDir + '/1-rakan-belum.png', fullPage: true });
+    // Buang rekod Bryan supaya ujian seterusnya bermula bersih.
+    for (const name of ['Markah', 'Draf']) {
+      const sh = g.ss.getSheetByName(name);
+      const rows = g.rows(name);
+      for (let i = rows.length - 1; i >= 1; i--) if (rows[i][name === 'Markah' ? 2 : 1] === bryan.id) sh.deleteRow(i + 1);
+    }
+    g.call('bust_');
+  });
+
   await langkah('1b. Jawab kuiz: satu soalan satu kad, susunan dirawak, draf disimpan di Sheet', async () => {
     await page.getByRole('button', { name: 'Mula' }).click();
     await page.waitForSelector('#kad .opt');

@@ -208,3 +208,9 @@ td.weak { color: var(--no); font-weight: 700; }
   body.printing-one .card:not(.print-me) { display: none !important; }
   .wrap { max-width: none; padding: 0; }
 }
+
+/* Rakan belum menjawab (muka depan murid) */
+details.rakan { margin-top: 12px; border-top: 1px dashed var(--line); padding-top: 10px; }
+details.rakan summary { cursor: pointer; font-weight: 600; font-size: .92rem; color: var(--pri-d); min-height: 32px; }
+details.rakan .names { margin: 6px 0; }
+p.rakan { margin-top: 12px; }

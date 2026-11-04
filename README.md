@@ -194,6 +194,9 @@ muncul (banyak gambar), klik Terbitkan sekali lagi: gambar yang siap tidak dimua
    gunakan *Log keluar* pada komputer bersama.
 2. **Muka depan:** kuiz yang dibuka untuk kelasnya, status *Belum dijawab / Sedang dijawab / Sudah dijawab*,
    markah setiap cubaan dan tarikh tutup. Kuiz yang sudah ditutup disenaraikan di bawah.
+   **Murid belum menjawab:** setiap kuiz yang dibuka menunjukkan nama murid **sekelas** yang belum menjawab
+   (tekan untuk buka senarai), dengan butang **Salin peringatan** untuk ditampal di WhatsApp kelas.
+   Hanya nama murid kelas sendiri dipaparkan; dikemas kini setiap minit.
 3. **Kuiz:** satu soalan satu kad, bar kemajuan, senarai nombor soalan, pemasa (jika ada).
    Susunan soalan dan pilihan dirawakkan bagi setiap murid. Jawapan disimpan automatik di Sheet (tab Draf),
    jadi murid boleh sambung di telefon lain.

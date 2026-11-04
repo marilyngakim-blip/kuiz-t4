@@ -141,9 +141,39 @@
     }
     if (q.bolehSemak) actions.append(el('a', { class: 'btn ghost', href: 'kuiz.html?semak=1&id=' + encodeURIComponent(q.id), text: 'Lihat jawapan' }));
     if (used || !q.open) actions.append(el('a', { class: 'btn ghost', href: 'ranking.html?id=' + encodeURIComponent(q.id), text: '🏆 Ranking' }));
+    const rakan = q.open && q.rakanBelum ? rakanBelum(q) : null;
     return el('div', { class: 'card qcard', 'data-quiz': q.id },
       el('div', { class: 'row' }, el('div', {}, el('h3', { text: q.tajuk }), q.topik ? el('p', { class: 'muted small', text: q.topik }) : null), statusBadge(q)),
-      chips, el('p', { class: 'small' + (q.open && q.tutup && q.tutup - now < 864e5 ? ' error' : ' muted'), text: tutupTxt }), att, actions);
+      chips, el('p', { class: 'small' + (q.open && q.tutup && q.tutup - now < 864e5 ? ' error' : ' muted'), text: tutupTxt }), att, actions, rakan);
+  }
+
+  // Senarai rakan sekelas yang belum menjawab + butang salin peringatan.
+  function rakanBelum(q) {
+    const s = sesi.get() || {};
+    const names = q.rakanBelum;
+    const belumSaya = !q.attempts.length;
+    const bil = names.length + (belumSaya ? 1 : 0);
+    const sudah = Math.max(0, (q.jumlahKelas || 0) - bil);
+    if (!bil) return el('p', { class: 'badge ok rakan', text: '🎉 Semua murid kelas ini sudah menjawab' });
+    const teks = '📢 Peringatan kuiz: ' + q.tajuk + '\n' +
+      (q.tutup ? 'Tutup: ' + tarikh(q.tutup) + '\n' : '') +
+      'Belum menjawab (' + s.kelas + '):\n' +
+      names.map((n, i) => (i + 1) + '. ' + n).join('\n') +
+      '\n\nJawab di: ' + location.href.replace(/[?#].*$/, '').replace(/index\.html$/, '');
+    const btn = el('button', { class: 'btn sm ghost', type: 'button', text: '📋 Salin peringatan', onclick: async () => {
+      try { await navigator.clipboard.writeText(teks); }
+      catch (e) {
+        const t = el('textarea', { style: 'position:fixed;opacity:0' }); t.value = teks; document.body.append(t); t.select();
+        try { document.execCommand('copy'); } catch (x) { /* abaikan */ } t.remove();
+      }
+      btn.textContent = '✓ Disalin – tampal di WhatsApp kelas';
+      setTimeout(() => { btn.textContent = '📋 Salin peringatan'; }, 2500);
+    } });
+    return el('details', { class: 'rakan' },
+      el('summary', { text: '👥 Murid belum menjawab: ' + names.length + (sudah ? ' · ' + sudah + ' sudah menjawab' : '') }),
+      names.length ? el('ol', { class: 'names small' }, names.map(n => el('li', { text: n }))) : el('p', { class: 'muted small', text: 'Hanya anda yang belum menjawab.' }),
+      names.length ? el('div', { class: 'actions' }, btn) : null,
+      el('p', { class: 'muted small', text: 'Dikemas kini setiap minit.' }));
   }
 
   async function muka() {
