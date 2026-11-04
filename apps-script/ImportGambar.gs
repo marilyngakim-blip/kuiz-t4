@@ -73,12 +73,16 @@ function importGambar() {
   });
 
   const log = [
-    tertangguh ? '⏳ BELUM SELESAI – klik Run sekali lagi untuk ' + tertangguh + ' gambar yang tinggal.' : '✅ SELESAI.',
+    tertangguh ? '⏳ BELUM SELESAI – klik Run sekali lagi untuk ' + tertangguh + ' gambar yang tinggal.'
+      : gagal.length ? '❌ ADA RALAT – ' + gagal.length + ' gambar gagal. Betulkan punca di bawah, kemudian Run sekali lagi.'
+      : '✅ SELESAI.',
     siap + ' gambar baharu disalin ke lajur H, ' + sedia + ' sudah ada sebelum ini.',
     tanpaGambar ? tanpaGambar + ' soalan dalam Form tiada gambar.' : '',
     tiadaPadanan.length ? '⚠️ ' + tiadaPadanan.length + ' soalan bergambar tidak dijumpai di tab Input Kuiz (teks soalan berbeza?): ' + tiadaPadanan.slice(0, 5).join(' | ') : '',
     gagal.length ? '⚠️ Gagal: ' + gagal.slice(0, 5).join(' | ') : '',
-    tertangguh ? '' : 'Seterusnya: di Sheet, KUIZ T4 → Terbitkan kuiz ke GitHub.'
+    gagal.some(x => /enabling APIs: drive/i.test(x))
+      ? '👉 Hidupkan Google Drive API: https://console.cloud.google.com/apis/library/drive.googleapis.com (projek yang sama), tunggu 2 minit, Run semula.' : '',
+    tertangguh || gagal.length ? '' : 'Seterusnya: di Sheet, KUIZ T4 → Terbitkan kuiz ke GitHub.'
   ].filter(Boolean).join('\n');
   console.log(log);
   return log;

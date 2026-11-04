@@ -209,6 +209,7 @@ Skrip kecil berasingan ini dihubungkan ke projek Google Cloud anda sendiri. Sist
 1. <https://console.cloud.google.com> → **Select a project → New project** → nama `Kuiz T4` → **Create**.
    Catat **Project number** (☰ → Cloud overview → Dashboard).
 2. <https://console.cloud.google.com/apis/library/forms.googleapis.com> → **Enable**.
+   Kemudian <https://console.cloud.google.com/apis/library/drive.googleapis.com> → **Enable** (untuk menyimpan gambar ke Drive).
 3. ☰ → **Google Auth Platform** (OAuth consent screen) → **Get started**: App name `Kuiz T4`, emel anda,
    Audience **External** → **Create**. Status *Testing* tidak mengapa.
 4. **Audience → Test users → + Add users** → emel anda → **Save**. (Wajib dalam status Testing.)
