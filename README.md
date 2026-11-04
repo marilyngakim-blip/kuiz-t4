@@ -196,15 +196,40 @@ Gambar pada **pilihan jawapan** (bukan soalan) tidak disokong; hanya teks piliha
 #### Import dari Google Form – gambar tidak disalin
 
 Gambar yang dilekatkan pada soalan dibaca melalui **Google Forms API**. Jika mesej akhir import
-mengandungi *"Gambar … TIDAK dapat dibaca: Google Forms API 403 …"*:
+mengandungi *"Google Forms API 403: Google Forms API has not been used in project …"*, API itu tidak boleh
+dihidupkan dalam projek Apps Script lalai (Google menyembunyikannya). Gunakan **skrip Import Gambar Form**
+di bawah. Soalan sudah disalin; skrip ini hanya mengisi lajur H.
 
-- *"… has not been used in project … or it is disabled"*: buka pautan `https://console.developers.google.com/…`
-  dalam mesej itu, klik **Enable**, tunggu 2 minit, kemudian import sekali lagi.
-- *"… insufficient authentication scopes"* atau *"caller does not have permission"*: pastikan akaun yang
-  menjalankan skrip boleh **mengedit** Form itu. Kemudian dalam Apps Script, jalankan mana-mana fungsi
-  (contohnya `importDariForm`) dari editor dan benarkan semua kebenaran yang diminta.
-- Jika masih gagal, salin mesej penuh dan hantar kepada pembangun. Sebagai jalan pintas, muat naik gambar
-  ke Drive dan tampal pautannya di lajur H secara manual.
+#### Skrip Import Gambar Form (sekali sahaja ±15 minit, kemudian ±2 minit setiap Form)
+
+Skrip kecil berasingan ini dihubungkan ke projek Google Cloud anda sendiri. Sistem kuiz utama (Code.gs)
+**tidak diubah**, jadi laman murid dan guru tidak terjejas.
+
+**A. Projek Google Cloud (sekali sahaja)**
+1. <https://console.cloud.google.com> → **Select a project → New project** → nama `Kuiz T4` → **Create**.
+   Catat **Project number** (☰ → Cloud overview → Dashboard).
+2. <https://console.cloud.google.com/apis/library/forms.googleapis.com> → **Enable**.
+3. ☰ → **Google Auth Platform** (OAuth consent screen) → **Get started**: App name `Kuiz T4`, emel anda,
+   Audience **External** → **Create**. Status *Testing* tidak mengapa.
+4. **Audience → Test users → + Add users** → emel anda → **Save**. (Wajib dalam status Testing.)
+
+**B. Cipta skrip (sekali sahaja)**
+5. <https://script.google.com> → **New project** → namakan `Import Gambar Form`.
+6. Padam kod sedia ada, tampal isi fail [`apps-script/ImportGambar.gs`](apps-script/ImportGambar.gs) → **Ctrl+S**.
+7. **Project Settings** (gear) → **Google Cloud Platform (GCP) Project → Change project** → Project number
+   dari langkah 1 → **Set project**.
+
+**C. Setiap kali import Form bergambar**
+8. Dalam Sheet kuiz: **KUIZ T4 → Kosongkan Input Kuiz**, kemudian **Import dari Google Form** (soalan disalin).
+9. Dalam skrip *Import Gambar Form*: isi `FORM_URL` (pautan edit Form) dan `SHEET_URL` (pautan Sheet kuiz)
+   di bahagian atas kod → **Ctrl+S**.
+10. Pilih fungsi **importGambar** → **▷ Run**. Kali pertama: **Review permissions** → akaun anda →
+    **Advanced → Go to Import Gambar Form (unsafe)** → **Allow**.
+11. Lihat **Execution log** di bawah: *✅ SELESAI* atau *⏳ BELUM SELESAI* (Run sekali lagi).
+12. Kembali ke Sheet: lajur H kini berisi pautan Drive → **KUIZ T4 → Terbitkan kuiz ke GitHub**.
+
+Jika lajur H sudah ada pautan bagi sesuatu soalan, skrip melangkaunya. Padanan dibuat ikut teks soalan,
+jadi jangan ubah teks soalan di Input Kuiz sebelum menjalankan skrip ini.
 
 ---
 
@@ -302,4 +327,5 @@ node ujian/server.js
 | `config.js` | URL Web App – dijana oleh Sheet |
 | `kuiz/*.json`, `kuiz/img/` | Soalan (tanpa jawapan) & gambar – dijana oleh Sheet |
 | `apps-script/Code.gs` | Skrip Google Sheet |
+| `apps-script/ImportGambar.gs` | Skrip berasingan untuk menyalin gambar Google Form (jika Forms API ditolak) |
 | `ujian/` | Pelayan Apps Script palsu & ujian Playwright |

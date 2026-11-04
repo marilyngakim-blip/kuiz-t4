@@ -286,7 +286,8 @@ function createGas(opts = {}) {
   };
 
   Object.assign(ctx, {
-    SpreadsheetApp: { getActive: () => ss, getActiveSpreadsheet: () => ss, getUi: () => ui, flush() {} },
+    SpreadsheetApp: { getActive: () => ss, getActiveSpreadsheet: () => ss, getUi: () => ui, flush() {},
+      openByUrl: () => ss, openById: () => ss },
     CacheService, PropertiesService, LockService, Utilities, ContentService, UrlFetchApp, DriveApp, FormApp,
     ScriptApp: { getOAuthToken: () => 'oauth-palsu' },
     Session: { getScriptTimeZone: () => 'Asia/Kuala_Lumpur' }
@@ -315,8 +316,25 @@ function createGas(opts = {}) {
   }
   function rows(name) { const s = ss.getSheetByName(name); return s ? s.getDataRange().getValues() : null; }
 
+  // Muatkan skrip Apps Script lain (projek berasingan) yang berkongsi Sheet/Drive/GitHub palsu yang sama.
+  function loadScript(file, ganti) {
+    const c2 = vm.createContext({ console: { log() {}, error() {} }, __clock: ctx.__clock });
+    vm.runInContext(`const RealDate = Date;
+      class FakeDate extends RealDate {
+        constructor(...a) { if (a.length === 0) super(RealDate.now() + __clock.offset); else super(...a); }
+        static now() { return RealDate.now() + __clock.offset; }
+      }
+      Date = FakeDate;`, c2);
+    ['SpreadsheetApp', 'CacheService', 'PropertiesService', 'LockService', 'Utilities', 'ContentService', 'UrlFetchApp',
+      'DriveApp', 'FormApp', 'ScriptApp', 'Session'].forEach(k => { c2[k] = ctx[k]; });
+    let src = fs.readFileSync(path.join(__dirname, '..', 'apps-script', file), 'utf8');
+    Object.keys(ganti || {}).forEach(k => { src = src.replace(k, ganti[k]); });
+    vm.runInContext(src, c2, { filename: file });
+    return { call: (fn, ...a) => vm.runInContext(fn, c2)(...a) };
+  }
+
   const api = {
-    ctx, ss, ui, props, gh, drive, urls, forms, fetchLog, cacheStore, lock, Date: CDate, Blob,
+    ctx, ss, ui, loadScript, props, gh, drive, urls, forms, fetchLog, cacheStore, lock, Date: CDate, Blob,
     call, post, runMenu, rows,
     setClock(ms) { ctx.__clock.offset = ms; },
     advance(ms) { ctx.__clock.offset += ms; },

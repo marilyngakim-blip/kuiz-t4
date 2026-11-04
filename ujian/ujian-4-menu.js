@@ -330,6 +330,54 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
     assert.match(msg, /TIDAK dapat dibaca:\nGoogle Forms API 403/);
   });
 
+  await langkah('4m. Skrip berasingan "Import Gambar Form": isi lajur H selepas import tanpa gambar', async () => {
+    const formId = '1FormApiDitolakDiProjekLalai000';
+    const items = [{ title: 'KELAS', questionItem: { question: { choiceQuestion: { type: 'RADIO', options: [{ value: '4A' }] } } } }];
+    const appItems = [];
+    for (let i = 1; i <= 6; i++) {
+      const uri = 'https://lh3.googleusercontent.com/gambar-asing-' + i;
+      g.urls.set(uri, new g.Blob(signed(PNG), 'image/png'));
+      const tajuk = 'Tukarkan nombor ' + i + ' kepada asas dua';
+      const opts = ['1', '10', '11', '100'];
+      items.push({ title: tajuk, description: i === 3 ? 'Rajah di bawah' : undefined, questionItem: { image: { contentUri: uri }, question: {
+        choiceQuestion: { type: 'RADIO', options: opts.map(v => ({ value: v })) },
+        grading: { correctAnswers: { answers: [{ value: '10' }] } } } } });
+      appItems.push({ getType: () => 'MULTIPLE_CHOICE', getTitle: () => tajuk, getHelpText: () => (i === 3 ? 'Rajah di bawah' : ''),
+        asMultipleChoiceItem: () => ({ getChoices: () => opts.map((v, k) => ({ getValue: () => v, isCorrectAnswer: () => k === 1 })), getPoints: () => 1 }) });
+    }
+    // 1) Code.gs: Forms API ditolak (projek lalai) → soalan sahaja, lajur H kosong
+    g.forms[formId] = { app: { getTitle: () => 'KUIZ BAB 2 PART 1', getItems: () => appItems } };
+    g.runMenu('kosongkanInput', ['YES']);
+    let log = g.runMenu('importDariForm', [{ button: 'OK', text: 'https://docs.google.com/forms/d/' + formId + '/edit' }]);
+    assert.match(log[log.length - 1].msg, /6 soalan disalin[\s\S]*TIDAK dapat dibaca/);
+    const input = g.ss.getSheetByName('Input Kuiz');
+    assert(input.getRange(7, 8, 6, 1).getValues().every(r => r[0] === ''), 'lajur H kosong');
+    // 2) Skrip berasingan (projek Google Cloud sendiri) → Forms API berjaya
+    g.forms[formId].api = { info: { title: 'KUIZ BAB 2 PART 1' }, items };
+    const ig = g.loadScript('ImportGambar.gs', {
+      "'TAMPAL_PAUTAN_EDIT_GOOGLE_FORM_DI_SINI'": JSON.stringify('https://docs.google.com/forms/d/' + formId + '/edit'),
+      "'TAMPAL_PAUTAN_GOOGLE_SHEET_KUIZ_DI_SINI'": JSON.stringify('https://docs.google.com/spreadsheets/d/abc/edit')
+    });
+    let muat = 0;
+    g.fetchHook = url => { if (/gambar-asing-/.test(url)) { muat++; g.advance(60000); } };
+    let out = ig.call('importGambar');
+    assert.match(out, /BELUM SELESAI[\s\S]*1 gambar/, out);
+    out = ig.call('importGambar');
+    assert.match(out, /SELESAI\.\n1 gambar baharu disalin ke lajur H, 5 sudah ada/, out);
+    assert.strictEqual(muat, 6, 'setiap gambar dimuat turun sekali sahaja');
+    g.fetchHook = null;
+    const h = input.getRange(7, 8, 6, 1).getValues().map(r => r[0]);
+    h.forEach(x => assert.match(x, /^https:\/\/drive\.google\.com\/file\/d\//));
+    // 3) Terbitkan dari Sheet → gambar ke GitHub
+    input.getRange('B2').setValue('');
+    log = g.runMenu('terbitkanKuiz', ['YES', 'NO']);
+    assert.match(log[log.length - 1].title, /BERJAYA – 6 soalan/);
+    assert(g.gh.get('kuiz/img/kuiz-bab-2-part-1/q6.png'));
+    // Pautan salah → ralat jelas
+    const bad = g.loadScript('ImportGambar.gs', { "'TAMPAL_PAUTAN_EDIT_GOOGLE_FORM_DI_SINI'": "'https://docs.google.com/forms/d/e/abc/viewform'" });
+    assert.throws(() => bad.call('importGambar'), /bukan pautan untuk murid/);
+  });
+
   await srv.close();
   selesai();
 })().catch(e => { console.error(e); process.exit(1); });
