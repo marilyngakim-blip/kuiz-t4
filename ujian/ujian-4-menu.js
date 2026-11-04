@@ -43,7 +43,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
       ['', '', '', '']
     ];
     imp.getRange(1, 1, data.length, 4).setValues(data);
-    const log = g.runMenu('importMurid');
+    const log = g.runMenu('importMurid', ['YES']);
     const murid = g.rows('Murid').slice(1);
     assert.strictEqual(murid.length, 3);
     assert.deepStrictEqual(murid.map(r => r[2]), ['4 BESTARI', '4 BESTARI', '4 Dinamik'], 'ejaan kelas diseragamkan');
@@ -51,11 +51,42 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
     assert.deepStrictEqual(murid.map(r => r[0]), ['M0001', 'M0002', 'M0003']);
     assert(!JSON.stringify(g.rows('Murid')).includes('090101'), 'tiada No. KP');
     assert.strictEqual(g.ss.getSheetByName('Import Murid').getLastRow(), 0, 'tab import dikosongkan');
-    assert.match(log[0].msg, /3 murid baharu[\s\S]*1 murid sudah ada/);
+    assert.match(log[log.length - 1].msg, /3 murid baharu[\s\S]*1 murid sudah ada/);
     // Import tanpa lajur Kelas → tanya kelas
     imp.getRange(1, 1, 2, 1).setValues([['Nama'], ['SITI HAJAR']]);
-    g.runMenu('importMurid', [{ button: 'OK', text: '4 Dinamik' }]);
-    assert.deepStrictEqual(g.rows('Murid')[4].slice(0, 3), ['M0004', 'SITI HAJAR', '4 Dinamik']);
+    const l2 = g.runMenu('importMurid', [{ button: 'OK', text: '4 Dinamik' }, 'NO']);
+    assert.deepStrictEqual(g.rows('Murid')[4].slice(0, 4), ['M0004', 'SITI HAJAR', '4 Dinamik', ''], 'NO = tanpa PIN');
+    assert.match(l2[l2.length - 1].msg, /tanpa PIN/);
+  });
+
+  await langkah('4b2. PIN pilihan: murid tanpa PIN terus masuk; murid ber-PIN masih perlu PIN', async () => {
+    const list = g.post({ action: 'students', kelas: '4 Dinamik' }).murid;
+    const siti = list.find(x => x.nama === 'SITI HAJAR');
+    const rajesh = list.find(x => x.nama === 'RAJESH A/L KUMAR');
+    assert.strictEqual(siti.pin, false);
+    assert.strictEqual(rajesh.pin, true);
+    assert(!JSON.stringify(list).match(/"pin":"\d/), 'nilai PIN tidak didedahkan');
+    assert.strictEqual(g.post({ action: 'login', id: siti.id, pin: '' }).ok, true);
+    assert.strictEqual(g.post({ action: 'login', id: rajesh.id, pin: '' }).ok, false);
+    const browser = await chromium.launch();
+    const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+    const errors = ralatKonsol(page);
+    // Belum ada kuiz diterbitkan (tiada config.js): sambungkan laman terus ke Web App palsu.
+    await page.route('**/config.js', r => r.fulfill({ contentType: 'text/javascript',
+      body: 'window.T4_CONFIG = { APPS_SCRIPT_URL: ' + JSON.stringify(srv.apiUrl) + ' };' }));
+    await page.goto(srv.base);
+    await page.getByRole('button', { name: '4 Dinamik', exact: true }).click();
+    await page.getByRole('button', { name: 'SITI HAJAR' }).click();
+    await page.getByText('Log keluar').waitFor();
+    assert.strictEqual(await page.locator('#pin').count(), 0, 'tiada skrin PIN');
+    await page.getByRole('button', { name: 'Log keluar' }).click({ trial: true });
+    page.once('dialog', dl => dl.accept());
+    await page.getByRole('button', { name: 'Log keluar' }).click();
+    await page.getByRole('button', { name: '4 Dinamik', exact: true }).click();
+    await page.getByRole('button', { name: 'RAJESH A/L KUMAR' }).click();
+    await page.locator('#pin').waitFor();
+    assert.deepStrictEqual(errors, []);
+    await browser.close();
   });
 
   await langkah('4c. Jana PIN rawak: kosong sahaja / semua (PIN 0xxx kekal 4 digit)', async () => {
@@ -65,7 +96,10 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
     g.runMenu('janaPin', ['YES']);
     const baru = g.rows('Murid').slice(1).map(r => r[3]);
     assert.match(String(baru[0]), /^\d{4}$/);
-    assert.deepStrictEqual(baru.slice(1), lama.slice(1), 'PIN sedia ada tidak diubah');
+    lama.forEach((p, i) => {
+      if (p) assert.strictEqual(baru[i], p, 'PIN sedia ada tidak diubah');
+      else assert.match(String(baru[i]), /^\d{4}$/, 'PIN kosong diisi');
+    });
     // Token lama tidak sah selepas semua PIN ditukar
     const m = g.rows('Murid')[2];
     const tok = g.post({ action: 'login', id: m[0], pin: String(m[3]).padStart(4, '0') }).token;

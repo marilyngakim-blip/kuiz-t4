@@ -1,6 +1,6 @@
 # Kuiz Matematik Tingkatan 4 – Panduan Guru
 
-Sistem kuiz dalam talian untuk murid Tingkatan 4. Murid log masuk dengan **Kelas → Nama → PIN** di telefon,
+Sistem kuiz dalam talian untuk murid Tingkatan 4. Murid log masuk dengan **Kelas → Nama → PIN** (PIN pilihan) di telefon,
 menjawab kuiz, dan melihat ranking kelas. Guru melihat papan pemuka, senarai murid yang belum menjawab,
 analisis item dan memuat turun markah.
 
@@ -106,13 +106,19 @@ kekal dalam Google Sheet.
    **Kelas**; lajur lain seperti No. KP akan diabaikan).
 2. Tampal di sel **A1** tab **Import Murid**.
 3. **KUIZ T4 → Import senarai murid**.
-   - Murid baharu ditambah ke tab **Murid** dengan IDMurid (M0001, M0002, …) dan PIN 4 digit rawak.
+   - Anda ditanya: **YES** = jana PIN 4 digit untuk setiap murid baharu; **NO** = tanpa PIN.
+   - Murid baharu ditambah ke tab **Murid** dengan IDMurid (M0001, M0002, …).
    - Murid yang sudah ada (nama + kelas sama) dilangkau.
    - Tab Import Murid dikosongkan selepas itu (maklumat peribadi lain tidak disimpan).
    - Jika tiada lajur Kelas, anda akan diminta menaip nama kelas.
 4. Ulang untuk setiap kelas jika senarai berasingan.
 
 Nama kelas (cth `4 Bestari`) dipaparkan kepada murid seperti yang ditulis dalam tab Murid.
+
+**PIN adalah pilihan.** Murid yang lajur PIN-nya (lajur D) **kosong** terus masuk selepas memilih nama.
+Murid yang ada PIN perlu menaipnya. Tanpa PIN, murid boleh memilih nama rakan dan menjawab atas namanya;
+PIN menghalang perkara ini. Anda boleh mula tanpa PIN dan tambah PIN kemudian (*Jana PIN rawak → YES*),
+atau padam PIN seorang murid supaya dia masuk tanpa PIN.
 
 **Mengedarkan PIN:** dalam tab Murid, **Data → Create a filter** → tapis lajur Kelas → cetak atau salin
 Nama + PIN, dan berikan kepada setiap murid secara peribadi.
@@ -180,7 +186,7 @@ muncul (banyak gambar), klik Terbitkan sekali lagi: gambar yang siap tidak dimua
 
 ## Apa yang murid lihat
 
-1. **Log masuk:** pilih Kelas → pilih Nama → PIN. Sesi disimpan dalam pelayar (bukan PIN) selama 30 hari;
+1. **Log masuk:** pilih Kelas → pilih Nama → PIN (jika murid itu ada PIN). Sesi disimpan dalam pelayar (bukan PIN) selama 30 hari;
    gunakan *Log keluar* pada komputer bersama.
 2. **Muka depan:** kuiz yang dibuka untuk kelasnya, status *Belum dijawab / Sedang dijawab / Sudah dijawab*,
    markah setiap cubaan dan tarikh tutup. Kuiz yang sudah ditutup disenaraikan di bawah.
@@ -215,7 +221,8 @@ Skala gred: A+ 90–100, A 80–89, A- 70–79, B+ 65–69, B 60–64, C+ 55–5
   dalam Google Sheet anda sahaja.
 - API tidak memulangkan kunci jawapan sebelum murid menghantar, dan sebelum kuiz ditutup jika
   *Tunjuk jawapan = Selepas tutup*.
-- Murid hanya boleh menjawab atas namanya sendiri (sesi bertandatangan digital; sesi tamat jika PIN ditukar).
+- Murid yang ada PIN hanya boleh menjawab atas namanya sendiri (sesi bertandatangan digital; sesi tamat jika PIN ditukar).
+  Murid tanpa PIN tidak dilindungi dengan cara ini.
 - Ranking murid hanya memaparkan nama 10 teratas dan markahnya. IDMurid tidak didedahkan.
 - Jangan gunakan No. KP sebagai IDMurid. Jangan kongsi Sheet dengan murid.
 - `GURU_PASSWORD`, `GITHUB_TOKEN` dan `SESSION_SECRET` (dijana sendiri) hanya dalam Script properties.

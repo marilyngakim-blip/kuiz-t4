@@ -331,7 +331,7 @@ function muridSenarai_(req) {
   return {
     ok: true,
     murid: muridAktif_().filter(m => norm_(m.kelas) === k)
-      .map(m => ({ id: m.id, nama: m.nama }))
+      .map(m => ({ id: m.id, nama: m.nama, pin: !!m.pin })) // pin: perlu PIN atau tidak (bukan nilai PIN)
       .sort((a, b) => a.nama.localeCompare(b.nama, 'ms'))
   };
 }
@@ -346,7 +346,8 @@ function login_(req) {
     return { ok: false, error: 'Terlalu banyak cubaan PIN salah. Cuba lagi dalam ' + min + ' minit.', locked: true };
   }
   const m = muridAktif_().find(x => x.id === id);
-  if (!m || !m.pin || m.pin !== pin) {
+  // Lajur PIN kosong = murid ini masuk tanpa PIN.
+  if (!m || (m.pin && m.pin !== pin)) {
     const n = (Number(c.get('pinfail:' + id)) || 0) + 1;
     if (n >= PIN_MAX_SALAH) {
       c.put('pinlock:' + id, String(Date.now() + PIN_KUNCI_SAAT * 1000), PIN_KUNCI_SAAT);
@@ -993,6 +994,12 @@ function importMurid() {
     kelasLalai = r.getResponseText().trim().replace(/\s+/g, ' ');
   }
 
+  const jawabPin = ui.alert('PIN murid baharu',
+    'YES = jana PIN 4 digit untuk setiap murid baharu (lebih selamat: murid tidak boleh menjawab atas nama rakan).\n' +
+    'NO = tanpa PIN (murid terus masuk selepas memilih nama). PIN boleh ditambah kemudian melalui "Jana PIN rawak".',
+    ui.ButtonSet.YES_NO_CANCEL);
+  if (jawabPin !== ui.Button.YES && jawabPin !== ui.Button.NO) return;
+  const denganPin = jawabPin === ui.Button.YES;
   const murid = getOrCreate_(ss, TAB.MURID);
   tajukTab_(murid, HEAD.Murid);
   const sedia = dataRows_(TAB.MURID, 5);
@@ -1017,7 +1024,7 @@ function importMurid() {
     if (ada[k]) { sama++; return; }
     ada[k] = 1;
     maxId++;
-    baru.push(['M' + ('0000' + maxId).slice(-4), safe_(nama), safe_(kelas), pinRawak_(), 'Y']);
+    baru.push(['M' + ('0000' + maxId).slice(-4), safe_(nama), safe_(kelas), denganPin ? pinRawak_() : '', 'Y']);
   });
   if (baru.length) {
     const start = murid.getLastRow() + 1;
@@ -1030,7 +1037,7 @@ function importMurid() {
   const kelasBaru = {};
   baru.forEach(r => { kelasBaru[r[2]] = (kelasBaru[r[2]] || 0) + 1; });
   ui.alert('Import selesai',
-    baru.length + ' murid baharu ditambah ke tab "' + TAB.MURID + '" (PIN dijana automatik).\n' +
+    baru.length + ' murid baharu ditambah ke tab "' + TAB.MURID + '"' + (denganPin ? ' (PIN dijana automatik).' : ' (tanpa PIN).') + '\n' +
     Object.keys(kelasBaru).map(k => '  • ' + k + ': ' + kelasBaru[k] + ' murid').join('\n') +
     (sama ? '\n\n' + sama + ' murid sudah ada (dilangkau).' : '') +
     (kosong ? '\n' + kosong + ' baris tanpa nama/kelas dilangkau.' : '') +

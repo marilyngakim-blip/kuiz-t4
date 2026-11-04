@@ -47,7 +47,7 @@
       const q = cari.value.trim().toLowerCase();
       list.innerHTML = '';
       r.murid.filter(m => !q || m.nama.toLowerCase().includes(q))
-        .forEach(m => list.append(el('button', { type: 'button', text: m.nama, onclick: () => masukPin(kelas, m) })));
+        .forEach(m => list.append(el('button', { type: 'button', text: m.nama, onclick: () => (m.pin ? masukPin(kelas, m) : masukTanpaPin(kelas, m, list)) })));
       if (!list.children.length) list.append(el('p', { class: 'empty', text: 'Tiada nama sepadan.' }));
     };
     cari.addEventListener('input', draw);
@@ -56,6 +56,19 @@
       el('p', { class: 'muted', text: 'Langkah 2: pilih nama anda.' }),
       r.murid.length > 8 ? el('div', { class: 'field' }, cari) : null, list,
       el('div', { class: 'actions' }, el('button', { class: 'btn ghost', type: 'button', text: '← Tukar kelas', onclick: pilihKelas }))));
+  }
+
+  // Murid tanpa PIN (lajur PIN kosong di Sheet): terus log masuk.
+  async function masukTanpaPin(kelas, m, list) {
+    list.querySelectorAll('button').forEach(b => { b.disabled = true; });
+    const r = await api('login', { id: m.id, pin: '' });
+    if (!r || !r.ok) {
+      list.querySelectorAll('button').forEach(b => { b.disabled = false; });
+      alert((r && r.error) || 'Ralat. Cuba lagi.');
+      return;
+    }
+    sesi.set({ token: r.token, id: m.id, nama: r.nama, kelas: r.kelas });
+    muka();
   }
 
   function masukPin(kelas, m) {
