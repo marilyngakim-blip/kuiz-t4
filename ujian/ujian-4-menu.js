@@ -284,6 +284,52 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
     assert.strictEqual(g.post({ action: 'login', id: lim, pin: '0387' }).ok, true);
   });
 
+  await langkah('4k. Form dengan gambar pada SETIAP soalan: had masa → klik sekali lagi untuk sambung', async () => {
+    const formId = '1FormGambarSetiapSoalan00000000';
+    const items = [];
+    for (let i = 1; i <= 8; i++) {
+      const uri = 'https://lh3.googleusercontent.com/form-gambar-' + i;
+      g.urls.set(uri, new g.Blob(signed(PNG), 'image/png'));
+      items.push({ title: 'Soalan bergambar ' + i, questionItem: { image: { contentUri: uri }, question: {
+        choiceQuestion: { type: 'RADIO', options: ['A' + i, 'B' + i, 'C' + i, 'D' + i].map(v => ({ value: v })) },
+        grading: { pointValue: 1, correctAnswers: { answers: [{ value: 'C' + i }] } } } } });
+    }
+    g.forms[formId] = { app: { getTitle: () => 'Matematik T4 Bab 2 Asas Nombor', getItems: () => [] }, api: { items } };
+    // Setiap muat turun gambar mengambil 1 minit (simulasi) → had 4.5 minit dicapai.
+    let muatTurun = 0;
+    g.fetchHook = url => { if (/form-gambar-/.test(url)) { muatTurun++; g.advance(60000); } };
+    const link = { button: 'OK', text: 'https://docs.google.com/forms/d/' + formId + '/edit' };
+    let log = g.runMenu('importDariForm', [link]);
+    assert.match(log[log.length - 1].title, /belum selesai/);
+    assert.match(log[log.length - 1].msg, /5 gambar siap, 3 gambar lagi/);
+    const pertama = muatTurun;
+    log = g.runMenu('importDariForm', [link]);
+    assert.match(log[log.length - 1].title, /Import selesai/);
+    assert.match(log[log.length - 1].msg, /8 soalan disalin[\s\S]*8 gambar/);
+    assert.strictEqual(muatTurun - pertama, 3, 'hanya 3 gambar baki dimuat turun');
+    g.fetchHook = null;
+    const rows = g.ss.getSheetByName('Input Kuiz').getRange(7, 1, 8, 8).getValues();
+    rows.forEach(r => assert.match(r[7], /^https:\/\/drive\.google\.com\/file\/d\//));
+    assert.deepStrictEqual(rows.map(r => r[5]), Array(8).fill('C'));
+    // Terbitkan → 8 gambar ke GitHub
+    g.ss.getSheetByName('Input Kuiz').getRange('B2').setValue('Bab 2');
+    log = g.runMenu('terbitkanKuiz', ['YES', 'NO']);
+    assert.match(log[log.length - 1].title, /BERJAYA – 8 soalan/);
+    for (let i = 1; i <= 8; i++) assert(g.gh.get('kuiz/img/matematik-t4-bab-2-asas-nombor/q' + i + '.png'), 'gambar ' + i);
+  });
+
+  await langkah('4l. Forms API tiada kebenaran: mesej jelas, soalan tetap disalin', async () => {
+    const formId = '1FormTanpaApi000000000000000000';
+    g.forms[formId] = { app: { getTitle: () => 'Form Tanpa API', getItems: () => [
+      { getType: () => 'MULTIPLE_CHOICE', getTitle: () => 'Q1', getHelpText: () => '', asMultipleChoiceItem: () => ({
+        getChoices: () => ['1', '2', '3', '4'].map((v, i) => ({ getValue: () => v, isCorrectAnswer: () => i === 1 })), getPoints: () => 1 }) }
+    ] } }; // tiada "api" → 403
+    const log = g.runMenu('importDariForm', [{ button: 'OK', text: formId }]);
+    const msg = log[log.length - 1].msg;
+    assert.match(msg, /1 soalan disalin/);
+    assert.match(msg, /TIDAK dapat dibaca:\nGoogle Forms API 403/);
+  });
+
   await srv.close();
   selesai();
 })().catch(e => { console.error(e); process.exit(1); });

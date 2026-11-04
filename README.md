@@ -178,13 +178,33 @@ Muat naik gambar ke Google Drive (akaun yang sama) → klik kanan → *Copy link
 Semasa Terbitkan, gambar disalin ke GitHub (maks 5 MB setiap satu). Jika mesej *Masa hampir tamat*
 muncul (banyak gambar), klik Terbitkan sekali lagi: gambar yang siap tidak dimuat naik semula.
 
-### Import dari Google Form
+### Import dari Google Form (termasuk gambar setiap soalan)
 
-1. Buka Google Form kuiz anda untuk diedit; salin pautan dari bar alamat (`…/forms/d/…/edit`).
-2. **KUIZ T4 → Import dari Google Form** → tampal → OK.
-3. Soalan aneka pilihan 4-pilihan yang ada kunci jawapan disalin ke Input Kuiz, termasuk gambar
-   (disimpan dalam folder Drive *Kuiz T4 – Gambar*). Mesej akhir menyenaraikan soalan yang dilangkau.
-4. Semak B1/B2 → **Terbitkan kuiz ke GitHub**.
+1. Buka Google Form kuiz anda **untuk diedit** (akaun yang sama dengan Sheet ini, atau akaun yang ada akses
+   edit), kemudian salin pautan dari bar alamat: `https://docs.google.com/forms/d/…/edit`.
+2. **KUIZ T4 → Import dari Google Form** → tampal pautan → **OK**.
+3. Soalan aneka pilihan 4-pilihan yang ada kunci jawapan disalin ke tab Input Kuiz. Gambar setiap soalan
+   disimpan dalam folder Drive **Kuiz T4 – Gambar**, dan pautannya diletak di lajur **H**.
+4. **Banyak gambar?** Google menghentikan skrip selepas 6 minit. Jika muncul mesej
+   **"Import belum selesai – klik sekali lagi"**, jalankan menu yang sama sekali lagi dengan pautan yang sama.
+   Gambar yang sudah siap tidak dimuat turun semula. Ulang sehingga muncul **"Import selesai"**.
+5. Semak tajuk (B1), isi topik (B2), kemudian **Terbitkan kuiz ke GitHub**. Gambar dimuat naik ke GitHub;
+   jika mesej *Masa hampir tamat* muncul, klik Terbitkan sekali lagi.
+
+Gambar pada **pilihan jawapan** (bukan soalan) tidak disokong; hanya teks pilihan disalin.
+
+#### Import dari Google Form – gambar tidak disalin
+
+Gambar yang dilekatkan pada soalan dibaca melalui **Google Forms API**. Jika mesej akhir import
+mengandungi *"Gambar … TIDAK dapat dibaca: Google Forms API 403 …"*:
+
+- *"… has not been used in project … or it is disabled"*: buka pautan `https://console.developers.google.com/…`
+  dalam mesej itu, klik **Enable**, tunggu 2 minit, kemudian import sekali lagi.
+- *"… insufficient authentication scopes"* atau *"caller does not have permission"*: pastikan akaun yang
+  menjalankan skrip boleh **mengedit** Form itu. Kemudian dalam Apps Script, jalankan mana-mana fungsi
+  (contohnya `importDariForm`) dari editor dan benarkan semua kebenaran yang diminta.
+- Jika masih gagal, salin mesej penuh dan hantar kepada pembangun. Sebagai jalan pintas, muat naik gambar
+  ke Drive dan tampal pautannya di lajur H secara manual.
 
 ---
 

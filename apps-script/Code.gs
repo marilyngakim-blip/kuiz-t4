@@ -1455,22 +1455,35 @@ function importDariForm() {
     const formId = m ? m[1] : text;
     const form = FormApp.openById(formId);
     const sheet = sheet_(TAB.INPUT);
+    // Sambung import sebelum ini (Form yang sama): gambar yang sudah disalin ke Drive tidak dimuat turun semula.
+    const sedia = {};
+    if (String(sheet.getRange('B1').getValue()).trim() === String(form.getTitle()).trim() && sheet.getLastRow() >= FIRST_ROW) {
+      sheet.getRange(FIRST_ROW, 1, sheet.getLastRow() - FIRST_ROW + 1, 8).getValues().forEach(r => {
+        const h = String(r[7] || '').trim();
+        if (/^https:\/\/drive\.google\.com\//.test(h)) sedia[String(r[0]).replace(/^ (?==)/, '').trim()] = h;
+      });
+    }
     let data, apiNote = '';
     try {
       data = bacaFormApi_(formId);
     } catch (e) {
       data = bacaFormApp_(form);
-      apiNote = 'Gambar yang dilekatkan terus pada soalan tidak dapat dibaca (' + String(e.message).slice(0, 120) +
-        '). Hanya item gambar berasingan disalin. Tambah gambar lain secara manual di lajur H.';
+      apiNote = '⚠️ Gambar yang dilekatkan terus pada soalan TIDAK dapat dibaca:\n' + String(e.message).slice(0, 300) +
+        '\n\nHanya item gambar berasingan disalin. Lihat README bahagian "Import dari Google Form – gambar tidak disalin", ' +
+        'atau tambah pautan gambar Drive secara manual di lajur H.';
     }
     const rows = [], skipped = [], imgErrors = [];
-    let images = 0;
+    let images = 0, guna = 0, tertangguh = 0;
     data.list.forEach(it => {
       if (it.options.length !== 4) { skipped.push('"' + short_(it.title) + '" – ada ' + it.options.length + ' pilihan (perlu 4)'); return; }
       if (it.correct.length !== 1) { skipped.push('"' + short_(it.title) + '" – tiada kunci jawapan'); return; }
       let imageUrl = '';
-      if (it.image && masaHampirTamat_(mula)) {
-        imgErrors.push('S' + (rows.length + 1) + ': masa tamat – tampal pautan gambar di lajur H secara manual');
+      const lama = sedia[String(it.title).trim()];
+      if (it.image && lama) {
+        imageUrl = lama;
+        guna++;
+      } else if (it.image && masaHampirTamat_(mula)) {
+        tertangguh++; // had masa Google: sambung dengan menjalankan import sekali lagi
       } else if (it.image) {
         try {
           imageUrl = simpanGambarDrive_(it.image(), form.getTitle() + ' – S' + (rows.length + 1));
@@ -1489,8 +1502,17 @@ function importDariForm() {
     sheet.getRange(FIRST_ROW, 1, rows.length, 8).setNumberFormat('@').setValues(rows);
     sheet.getRange('B1').setValue(safe_(form.getTitle()));
     sheet.getRange('B4').clearContent();
-    let msg = rows.length + ' soalan disalin ke tab "' + TAB.INPUT + '"' + (images ? ', termasuk ' + images + ' gambar (lajur H)' : '') +
-      '.\n\nLangkah seterusnya:\n1. Semak tajuk (B1) dan isi topik (B2).\n2. Semak soalan.\n3. KUIZ T4 → Terbitkan kuiz ke GitHub.';
+    if (tertangguh) {
+      ui.alert('Import belum selesai – klik sekali lagi',
+        rows.length + ' soalan disalin. ' + (images + guna) + ' gambar siap, ' + tertangguh + ' gambar lagi belum disalin ' +
+        'kerana had masa Google (6 minit).\n\nJalankan KUIZ T4 → Import dari Google Form SEKALI LAGI dengan pautan yang sama. ' +
+        'Gambar yang sudah siap tidak akan dimuat turun semula.' +
+        (imgErrors.length ? '\n\nGambar gagal:\n' + imgErrors.slice(0, 5).join('\n') : ''), ui.ButtonSet.OK);
+      return;
+    }
+    let msg = rows.length + ' soalan disalin ke tab "' + TAB.INPUT + '"' +
+      (images + guna ? ', termasuk ' + (images + guna) + ' gambar (lajur H)' : '') +
+      '.\n\nLangkah seterusnya:\n1. Semak tajuk (B1) dan isi topik (B2).\n2. Semak soalan dan gambar (lajur H).\n3. KUIZ T4 → Terbitkan kuiz ke GitHub.';
     if (skipped.length) msg += '\n\nDilangkau (' + skipped.length + '):\n' + skipped.slice(0, 10).join('\n') + (skipped.length > 10 ? '\n…' : '');
     if (imgErrors.length) msg += '\n\nGambar gagal disalin:\n' + imgErrors.slice(0, 5).join('\n');
     if (data.optionImages) msg += '\n\n' + data.optionImages + ' soalan ada gambar pada pilihan jawapan. Gambar pilihan tidak disokong; hanya teks pilihan disalin.';
@@ -1506,7 +1528,11 @@ function bacaFormApi_(formId) {
   const res = UrlFetchApp.fetch('https://forms.googleapis.com/v1/forms/' + encodeURIComponent(formId), {
     headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }, muteHttpExceptions: true
   });
-  if (res.getResponseCode() !== 200) throw new Error('Forms API ' + res.getResponseCode());
+  if (res.getResponseCode() !== 200) {
+    let why = '';
+    try { why = JSON.parse(res.getContentText()).error.message; } catch (e) { why = res.getContentText().slice(0, 200); }
+    throw new Error('Google Forms API ' + res.getResponseCode() + ': ' + why);
+  }
   const data = JSON.parse(res.getContentText());
   const out = { list: [], others: 0, optionImages: 0 };
   let pending = null;

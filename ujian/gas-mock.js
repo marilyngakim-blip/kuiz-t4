@@ -234,6 +234,7 @@ function createGas(opts = {}) {
   const UrlFetchApp = {
     fetch(url, o = {}) {
       fetchLog.push({ url, method: o.method || 'get' });
+      if (api.fetchHook) api.fetchHook(url);
       let m = url.match(/^https:\/\/api\.github\.com\/repos\/([^/]+\/[^/]+)\/contents\/([^?]*)/);
       if (m) {
         if (!/^Bearer \S+/.test((o.headers || {}).Authorization || '')) return response(401, { message: 'Bad credentials' });
@@ -314,13 +315,14 @@ function createGas(opts = {}) {
   }
   function rows(name) { const s = ss.getSheetByName(name); return s ? s.getDataRange().getValues() : null; }
 
-  return {
+  const api = {
     ctx, ss, ui, props, gh, drive, urls, forms, fetchLog, cacheStore, lock, Date: CDate, Blob,
     call, post, runMenu, rows,
     setClock(ms) { ctx.__clock.offset = ms; },
     advance(ms) { ctx.__clock.offset += ms; },
     now
   };
+  return api;
 }
 
 module.exports = { createGas };
