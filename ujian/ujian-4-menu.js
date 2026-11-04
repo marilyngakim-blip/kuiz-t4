@@ -43,7 +43,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
       ['', '', '', '']
     ];
     imp.getRange(1, 1, data.length, 4).setValues(data);
-    const log = g.runMenu('importMurid', ['YES']);
+    const log = g.runMenu('importMurid', ['NO', 'YES']); // bukan No. KP → PIN rawak
     const murid = g.rows('Murid').slice(1);
     assert.strictEqual(murid.length, 3);
     assert.deepStrictEqual(murid.map(r => r[2]), ['4 BESTARI', '4 BESTARI', '4 Dinamik'], 'ejaan kelas diseragamkan');
@@ -254,6 +254,34 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
     j.createdAt = '2026-11-02T00:00:00.000Z';
     fs.mkdirSync(path.dirname(out), { recursive: true });
     fs.writeFileSync(out, JSON.stringify(j, null, 2) + '\n');
+  });
+
+  await langkah('4j. PIN = 4 digit terakhir No. KP (No. KP penuh tidak disimpan)', async () => {
+    const imp = g.ss.getSheetByName('Import Murid');
+    const data = [
+      ['Bil', 'Nama', 'No. Kad Pengenalan', 'Jantina', 'Kelas'],
+      ['1', 'LIM KAI WEN', '090415-12-0387', 'L', '4 Gemilang'],
+      ['2', 'NURUL AIN BINTI SAID', '90812125542', 'P', '4 Gemilang'],  // Excel buang sifar di depan
+      ['3', 'TAN WEI', '', 'L', '4 Gemilang'],                           // tiada No. KP
+      ['4', 'SITI HAJAR', '091111-12-7710', 'P', '4 Dinamik']            // murid sedia ada
+    ];
+    imp.getRange(1, 1, data.length, 5).setValues(data);
+    const log = g.runMenu('importMurid', ['YES']);
+    const msg = log[log.length - 1].msg;
+    assert.match(msg, /3 murid baharu[\s\S]*4 digit terakhir No\. KP/);
+    assert.match(msg, /PIN 1 murid dikemas kini/);
+    assert.match(msg, /1 murid tiada No\. KP/);
+    const rows = g.rows('Murid');
+    const pin = n => String(rows.find(r => r[1] === n)[3]);
+    assert.strictEqual(pin('LIM KAI WEN'), '0387', 'sifar di depan dikekalkan');
+    assert.strictEqual(pin('NURUL AIN BINTI SAID'), '5542');
+    assert.match(pin('TAN WEI'), /^\d{4}$/);
+    assert.strictEqual(pin('SITI HAJAR'), '7710', 'murid sedia ada dikemas kini');
+    const all = JSON.stringify(g.ss.sheets.map(sh => sh.data));
+    assert(!all.includes('090415') && !all.includes('90812125542'), 'No. KP penuh tidak disimpan');
+    g.call('bust_');
+    const lim = g.rows('Murid').find(r => r[1] === 'LIM KAI WEN')[0];
+    assert.strictEqual(g.post({ action: 'login', id: lim, pin: '0387' }).ok, true);
   });
 
   await srv.close();

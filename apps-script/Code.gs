@@ -971,13 +971,15 @@ function importMurid() {
     ui.alert('Tab "' + TAB.IMPORT + '" kosong',
       'Salin senarai murid dari Excel / APDM (termasuk baris tajuk lajur seperti "Nama" dan "Kelas"), ' +
       'kemudian tampal di sel A1 tab "' + TAB.IMPORT + '" dan jalankan menu ini sekali lagi.\n\n' +
-      'Hanya lajur Nama dan Kelas yang disalin. Lajur lain (No. KP, jantina, dll.) diabaikan.', ui.ButtonSet.OK);
+      'Hanya lajur Nama dan Kelas yang disalin. Jika ada lajur No. KP, anda boleh memilih 4 digit terakhirnya sebagai PIN; ' +
+      'No. KP penuh tidak disimpan. Lajur lain (jantina, dll.) diabaikan.', ui.ButtonSet.OK);
     return;
   }
   // Cari baris tajuk (mengandungi "Nama").
   let h = values.slice(0, 10).findIndex(r => r.some(x => /^nama(\s+murid|\s+pelajar)?$/i.test(x)));
-  let cNama, cKelas, data;
+  let cNama, cKelas, data, cIc = -1;
   if (h >= 0) {
+    cIc = values[h].findIndex(x => /^(no)?(kp|ic|mykad|kadpengenalan|pengenalan|nokadpengenalan)$/.test(x.toLowerCase().replace(/[^a-z]/g, '')));
     cNama = values[h].findIndex(x => /^nama(\s+murid|\s+pelajar)?$/i.test(x));
     cKelas = values[h].findIndex(x => /^(kelas|nama kelas)$/i.test(x));
     if (cKelas < 0) cKelas = values[h].findIndex(x => /kelas/i.test(x));
@@ -994,26 +996,44 @@ function importMurid() {
     kelasLalai = r.getResponseText().trim().replace(/\s+/g, ' ');
   }
 
-  const jawabPin = ui.alert('PIN murid baharu',
-    'YES = jana PIN 4 digit untuk setiap murid baharu (lebih selamat: murid tidak boleh menjawab atas nama rakan).\n' +
-    'NO = tanpa PIN (murid terus masuk selepas memilih nama). PIN boleh ditambah kemudian melalui "Jana PIN rawak".',
-    ui.ButtonSet.YES_NO_CANCEL);
-  if (jawabPin !== ui.Button.YES && jawabPin !== ui.Button.NO) return;
-  const denganPin = jawabPin === ui.Button.YES;
+  // PIN: 4 digit terakhir No. KP (jika ada lajur No. KP), rawak, atau tiada.
+  let pinIc = false;
+  if (cIc >= 0) {
+    const j = ui.alert('PIN daripada No. KP?',
+      'Lajur "' + values[h][cIc] + '" dijumpai.\n\n' +
+      'YES = PIN ialah 4 digit TERAKHIR No. KP setiap murid (murid sudah tahu, tidak perlu diedarkan). ' +
+      'Murid yang sudah ada dalam tab Murid juga dikemas kini PIN-nya.\n' +
+      'NO = pilihan lain (PIN rawak atau tanpa PIN).\n\nNo. KP penuh tidak disimpan.', ui.ButtonSet.YES_NO_CANCEL);
+    if (j !== ui.Button.YES && j !== ui.Button.NO) return;
+    pinIc = j === ui.Button.YES;
+  }
+  let denganPin = true;
+  if (!pinIc) {
+    const jawabPin = ui.alert('PIN murid baharu',
+      'YES = jana PIN 4 digit rawak untuk setiap murid baharu (lebih selamat: murid tidak boleh menjawab atas nama rakan).\n' +
+      'NO = tanpa PIN (murid terus masuk selepas memilih nama). PIN boleh ditambah kemudian melalui "Jana PIN rawak".',
+      ui.ButtonSet.YES_NO_CANCEL);
+    if (jawabPin !== ui.Button.YES && jawabPin !== ui.Button.NO) return;
+    denganPin = jawabPin === ui.Button.YES;
+  }
+  const ic4 = r => {
+    const d = String(r[cIc] || '').replace(/\D/g, '');
+    return d.length >= 4 ? d.slice(-4) : '';
+  };
   const murid = getOrCreate_(ss, TAB.MURID);
   tajukTab_(murid, HEAD.Murid);
   const sedia = dataRows_(TAB.MURID, 5);
   const ada = {};
   const ejaanKelas = {};
   let maxId = 0;
-  sedia.forEach(r => {
-    ada[norm_(r[1]) + '|' + norm_(r[2])] = 1;
+  sedia.forEach((r, i) => {
+    ada[norm_(r[1]) + '|' + norm_(r[2])] = i + 2; // nombor baris
     ejaanKelas[norm_(r[2])] = String(r[2]).trim();
     const m = String(r[0]).match(/^M(\d+)$/);
     if (m) maxId = Math.max(maxId, Number(m[1]));
   });
   const baru = [];
-  let sama = 0, kosong = 0;
+  let sama = 0, kosong = 0, tiadaIc = 0, pinDikemas = 0;
   data.forEach(r => {
     const nama = String(r[cNama] || '').replace(/\s+/g, ' ').trim();
     let kelas = (cKelas >= 0 ? String(r[cKelas] || '') : kelasLalai).replace(/\s+/g, ' ').trim();
@@ -1021,10 +1041,24 @@ function importMurid() {
     kelas = ejaanKelas[norm_(kelas)] || kelas;
     ejaanKelas[norm_(kelas)] = kelas;
     const k = norm_(nama) + '|' + norm_(kelas);
-    if (ada[k]) { sama++; return; }
-    ada[k] = 1;
+    let pin = '';
+    if (pinIc) {
+      pin = ic4(r);
+      if (!pin) { tiadaIc++; pin = pinRawak_(); }
+    } else if (denganPin) {
+      pin = pinRawak_();
+    }
+    if (ada[k]) {
+      sama++;
+      if (pinIc && ada[k] > 1) {
+        murid.getRange(ada[k], 4).setNumberFormat('@').setValue(pin);
+        pinDikemas++;
+      }
+      return;
+    }
+    ada[k] = -1;
     maxId++;
-    baru.push(['M' + ('0000' + maxId).slice(-4), safe_(nama), safe_(kelas), denganPin ? pinRawak_() : '', 'Y']);
+    baru.push(['M' + ('0000' + maxId).slice(-4), safe_(nama), safe_(kelas), pin, 'Y']);
   });
   if (baru.length) {
     const start = murid.getLastRow() + 1;
@@ -1037,9 +1071,11 @@ function importMurid() {
   const kelasBaru = {};
   baru.forEach(r => { kelasBaru[r[2]] = (kelasBaru[r[2]] || 0) + 1; });
   ui.alert('Import selesai',
-    baru.length + ' murid baharu ditambah ke tab "' + TAB.MURID + '"' + (denganPin ? ' (PIN dijana automatik).' : ' (tanpa PIN).') + '\n' +
+    baru.length + ' murid baharu ditambah ke tab "' + TAB.MURID + '"' +
+    (pinIc ? ' (PIN = 4 digit terakhir No. KP).' : denganPin ? ' (PIN dijana automatik).' : ' (tanpa PIN).') + '\n' +
     Object.keys(kelasBaru).map(k => '  • ' + k + ': ' + kelasBaru[k] + ' murid').join('\n') +
-    (sama ? '\n\n' + sama + ' murid sudah ada (dilangkau).' : '') +
+    (sama ? '\n\n' + sama + ' murid sudah ada' + (pinDikemas ? ' – PIN ' + pinDikemas + ' murid dikemas kini daripada No. KP.' : ' (dilangkau).') : '') +
+    (tiadaIc ? '\n⚠️ ' + tiadaIc + ' murid tiada No. KP yang sah – PIN rawak diberi (lihat lajur D).' : '') +
     (kosong ? '\n' + kosong + ' baris tanpa nama/kelas dilangkau.' : '') +
     '\n\nTab "' + TAB.IMPORT + '" telah dikosongkan (maklumat peribadi lain tidak disimpan).', ui.ButtonSet.OK);
 }

@@ -106,7 +106,11 @@ kekal dalam Google Sheet.
    **Kelas**; lajur lain seperti No. KP akan diabaikan).
 2. Tampal di sel **A1** tab **Import Murid**.
 3. **KUIZ T4 → Import senarai murid**.
-   - Anda ditanya: **YES** = jana PIN 4 digit untuk setiap murid baharu; **NO** = tanpa PIN.
+   - Jika senarai ada lajur **No. KP** (cth *No. KP*, *No. Kad Pengenalan*, *IC*, *MyKad*), anda ditanya
+     *PIN daripada No. KP?* **YES** = PIN ialah **4 digit terakhir No. KP** murid. Murid sudah tahu nombor
+     ini, jadi PIN tidak perlu diedarkan. Murid yang sudah ada dalam tab Murid juga dikemas kini PIN-nya.
+     Hanya 4 digit itu disimpan; No. KP penuh tidak disimpan. Murid tanpa No. KP yang sah diberi PIN rawak.
+   - Jika tidak: **YES** = jana PIN 4 digit rawak; **NO** = tanpa PIN.
    - Murid baharu ditambah ke tab **Murid** dengan IDMurid (M0001, M0002, …).
    - Murid yang sudah ada (nama + kelas sama) dilangkau.
    - Tab Import Murid dikosongkan selepas itu (maklumat peribadi lain tidak disimpan).
@@ -225,6 +229,9 @@ Skala gred: A+ 90–100, A 80–89, A- 70–79, B+ 65–69, B 60–64, C+ 55–5
   Murid tanpa PIN tidak dilindungi dengan cara ini.
 - Ranking murid hanya memaparkan nama 10 teratas dan markahnya. IDMurid tidak didedahkan.
 - Jangan gunakan No. KP sebagai IDMurid. Jangan kongsi Sheet dengan murid.
+- PIN daripada 4 digit terakhir No. KP lebih mudah, tetapi rakan rapat atau keluarga mungkin tahu nombor itu.
+  Jika ada murid yang disyaki menjawab atas nama orang lain, beri murid itu PIN rawak (padam PIN →
+  *Jana PIN rawak → YES*).
 - `GURU_PASSWORD`, `GITHUB_TOKEN` dan `SESSION_SECRET` (dijana sendiri) hanya dalam Script properties.
   Menukar `SESSION_SECRET` memaksa semua murid log masuk semula.
 
