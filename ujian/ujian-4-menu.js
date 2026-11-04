@@ -378,6 +378,59 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
     assert.throws(() => bad.call('importGambar'), /bukan pautan untuk murid/);
   });
 
+  await langkah('4n. Soalan bergambar dari Form: tajuk "Soalan 19" disembunyikan, butang A B C D tetap (tidak dirawak)', async () => {
+    const input = g.ss.getSheetByName('Input Kuiz');
+    g.runMenu('kosongkanInput', ['YES']);
+    input.getRange('B1').setValue('KUIZ GAMBAR HURUF');
+    const img = id => { g.drive.set(id, new g.Blob(signed(PNG), 'image/png')); return 'https://drive.google.com/file/d/' + id + '/view'; };
+    // Pilihan dalam Form hanya huruf, dalam susunan bercampur (seperti Form yang merawakkan pilihan).
+    input.getRange(7, 1, 3, 8).setNumberFormat('@').setValues([
+      ['Soalan 19', 'C', 'B', 'A', 'D', 'C', '1', img('1GambarHurufSoalanSembilanBelas0')], // betul = huruf "A"
+      ['Soalan 20', 'A', 'B', 'C', 'D', 'B', '1', img('1GambarHurufSoalanDuaPuluh000000')], // betul = huruf "B"
+      ['Hitung 2 + 2', '3', '4', '5', '6', 'B', '1', '']
+    ]);
+    const log = g.runMenu('terbitkanKuiz', ['YES', 'YES']);
+    assert.match(log[log.length - 1].title, /BERJAYA – 3 soalan/);
+    const siti = g.rows('Murid').find(r => r[1] === 'SITI HAJAR');
+    const pin = String(siti[3]).padStart(4, '0');
+    const browser = await chromium.launch();
+    const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+    const errors = ralatKonsol(page);
+    await page.goto(srv.base);
+    await page.getByRole('button', { name: '4 Dinamik', exact: true }).click();
+    await page.getByRole('button', { name: 'SITI HAJAR' }).click();
+    await page.fill('#pin', pin);
+    await page.getByRole('button', { name: 'Masuk' }).click();
+    await page.locator('#sambut').waitFor();
+    assert.match(await page.locator('#sambut h1').innerText(), /Hai, Siti Hajar!/);
+    await page.locator('[data-quiz="kuiz-gambar-huruf"]').getByRole('button', { name: 'Mula' }).click();
+    await page.waitForSelector('#kad .opt');
+    for (let k = 0; k < 3; k++) {
+      if (await page.locator('#kad .opts.huruf').count()) {
+        assert.strictEqual(await page.locator('#kad .qtext').count(), 0, 'tajuk "Soalan N" disembunyikan');
+        const label = (await page.locator('#kad .opt').allInnerTexts()).map(t => t.trim());
+        assert.deepStrictEqual(label, ['A', 'B', 'C', 'D'], 'A B C D sekali sahaja, susunan tetap');
+        const src = await page.locator('#kad img.qimg').getAttribute('src');
+        // Murid memilih "A" bagi kedua-dua soalan bergambar (betul bagi S19, salah bagi S20).
+        assert(/q[12]\.png$/.test(src));
+        await page.getByRole('radio', { name: 'Pilihan A' }).click();
+      } else {
+        assert.match(await page.locator('#kad .qtext').innerText(), /Hitung 2 \+ 2/);
+        await page.locator('#kad .opt').filter({ has: page.locator('.T', { hasText: /^4$/ }) }).click();
+      }
+      await page.click('#seterusnya');
+    }
+    await page.click('#hantar');
+    await page.locator('#keputusan').waitFor();
+    await page.locator('.sorak').waitFor();
+    assert.match(await page.locator('#keputusan .big').innerText(), /^2\s*\/\s*3$/);
+    const row = g.rows('Markah').filter(r => r[1] === 'kuiz-gambar-huruf').pop();
+    assert.strictEqual(row[10], 'C A B', 'jawapan dipetakan kepada huruf asal di Sheet');
+    await page.screenshot({ path: srv.outDir + '/4n-keputusan.png', fullPage: true });
+    assert.deepStrictEqual(errors, []);
+    await browser.close();
+  });
+
   await srv.close();
   selesai();
 })().catch(e => { console.error(e); process.exit(1); });

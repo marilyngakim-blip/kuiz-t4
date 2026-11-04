@@ -141,10 +141,46 @@
     return s;
   }
 
+  // Maskot "Si Pi" (watak simbol π) untuk laman murid.
+  const MASKOT = '<svg viewBox="0 0 120 120" aria-hidden="true">' +
+    '<circle cx="60" cy="60" r="56" fill="#FFD84D"/><circle cx="60" cy="60" r="56" fill="none" stroke="#fff" stroke-width="5" opacity=".6"/>' +
+    '<path d="M40 50 C40 72 37 86 29 97" stroke="#6C3CF0" stroke-width="14" stroke-linecap="round" fill="none"/>' +
+    '<path d="M80 50 L80 88 C80 97 87 99 94 94" stroke="#6C3CF0" stroke-width="14" stroke-linecap="round" fill="none"/>' +
+    '<rect x="20" y="30" width="80" height="22" rx="11" fill="#7C4DFF"/>' +
+    '<circle cx="47" cy="41" r="7" fill="#fff"/><circle cx="48.5" cy="42" r="3.6" fill="#1d1d1d"/>' +
+    '<circle cx="73" cy="41" r="7" fill="#fff"/><circle cx="74.5" cy="42" r="3.6" fill="#1d1d1d"/>' +
+    '<path d="M51 60 Q60 70 69 60" stroke="#1d1d1d" stroke-width="4" stroke-linecap="round" fill="none"/>' +
+    '<circle cx="47" cy="62" r="4" fill="#FF8FB1" opacity=".8"/><circle cx="73" cy="62" r="4" fill="#FF8FB1" opacity=".8"/>' +
+    '</svg>';
+  function maskot(cls) {
+    const span = document.createElement('span');
+    span.className = 'maskot ' + (cls || '');
+    span.innerHTML = MASKOT;
+    return span;
+  }
+
   function topbar(title, sub, right) {
-    return el('header', { class: 'topbar' },
+    const murid = document.body.classList.contains('murid');
+    return el('header', { class: 'topbar' }, murid ? maskot('kecil') : null,
       el('div', { class: 'brand' }, title, sub ? el('small', { text: sub }) : null), right || null);
   }
 
-  window.T4 = { CFG, store, sesi, api, beacon, el, tarikh, masa, baki, gred, shuffle, param, perluLogin, topbar, sleep };
+  // Konfeti berwarna (diabaikan jika murid memilih "kurangkan animasi").
+  function konfeti() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const warna = ['#FF6B6B', '#FFB020', '#2EC4B6', '#4D7CFE', '#B15CFF', '#FF8FB1'];
+    const simbol = ['+', '−', '×', '÷', 'π', '√', '='];
+    for (let i = 0; i < 60; i++) {
+      const c = el('span', { class: 'konfeti', text: i % 3 ? '' : simbol[i % simbol.length] });
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.color = c.style.background = warna[i % warna.length];
+      if (!(i % 3)) c.style.background = 'none';
+      c.style.animationDuration = (2.2 + Math.random() * 2) + 's';
+      c.style.animationDelay = (Math.random() * 0.6) + 's';
+      document.body.append(c);
+      setTimeout(() => c.remove(), 5000);
+    }
+  }
+
+  window.T4 = { CFG, store, sesi, api, beacon, el, tarikh, masa, baki, gred, shuffle, param, perluLogin, topbar, sleep, maskot, konfeti };
 })();

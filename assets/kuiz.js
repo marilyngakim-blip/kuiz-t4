@@ -1,6 +1,6 @@
 // Laman menjawab kuiz: satu soalan satu kad, pemasa, draf automatik, keputusan.
 (function () {
-  const { api, beacon, el, store, tarikh, masa, shuffle, param, perluLogin, topbar } = window.T4;
+  const { api, beacon, el, store, tarikh, masa, shuffle, param, perluLogin, topbar, maskot, konfeti } = window.T4;
   const L = ['A', 'B', 'C', 'D'];
   const s = perluLogin();
   if (!s) return;
@@ -41,10 +41,25 @@
 
   /* ================= Paparan soalan (dikongsi: menjawab & semakan) ================= */
 
+  // Soalan dari Google Form yang soalannya dalam gambar: teks hanya "Soalan 19" → disembunyikan.
+  const tajukSahaja = q => !!q.image && /^soalan\s*(no\.?\s*)?\d+\s*[.:)]?$/i.test(String(q.q || '').trim());
+  // Pilihan hanya huruf A/B/C/D (pilihan sebenar dalam gambar) → butang A B C D tetap, tidak dirawak.
+  const hurufPilihan = o => String(o == null ? '' : o).replace(/[\s().:]/g, '').toUpperCase();
+  const hurufSahaja = q => Array.isArray(q.options) && q.options.length === 4 &&
+    q.options.map(hurufPilihan).sort().join('') === 'ABCD';
+  const susunHuruf = q => [0, 1, 2, 3].sort((a, b) => hurufPilihan(q.options[a]).localeCompare(hurufPilihan(q.options[b])));
+  const susunPilihan = (q, rawak) => (hurufSahaja(q) ? susunHuruf(q) : rawak);
+
+  // Butang pilihan: huruf + teks, atau huruf sahaja bagi soalan bergambar A/B/C/D.
+  function isiPilihan(q, o, j) {
+    if (hurufSahaja(q)) return [el('span', { class: 'L', text: hurufPilihan(q.options[o]) })];
+    return [el('span', { class: 'L', text: L[j] }), el('span', { class: 'T', text: q.options[o] })];
+  }
+
   function teksSoalan(q, label) {
     return [
       el('div', { class: 'qno', text: label }),
-      el('div', { class: 'qtext', text: q.q }),
+      tajukSahaja(q) ? null : el('div', { class: 'qtext', text: q.q }),
       q.image ? el('img', { class: 'qimg', src: 'kuiz/' + q.image, alt: 'Rajah bagi ' + label.toLowerCase(), loading: 'lazy' }) : null
     ].filter(Boolean);
   }
@@ -55,11 +70,10 @@
     (order || quiz.questions.map((_, i) => i)).forEach((i, pos) => {
       const q = quiz.questions[i];
       const r = results[i];
-      const opts = el('div', { class: 'opts' });
-      (optOrder ? optOrder[i] : [0, 1, 2, 3]).forEach((o, j) => {
+      const opts = el('div', { class: 'opts' + (hurufSahaja(q) ? ' huruf' : '') });
+      (optOrder ? optOrder[i] : susunPilihan(q, [0, 1, 2, 3])).forEach((o, j) => {
         const cls = L[o] === r.answer ? 'opt correct' : L[o] === r.chosen ? 'opt wrong' : 'opt';
-        opts.append(el('button', { class: cls, type: 'button', disabled: true },
-          el('span', { class: 'L', text: L[j] }), el('span', { class: 'T', text: q.options[o] })));
+        opts.append(el('button', { class: cls, type: 'button', disabled: true }, isiPilihan(q, o, j)));
       });
       const badge = r.correct ? el('span', { class: 'badge ok', text: '✓ Betul' })
         : el('span', { class: 'badge no', text: r.chosen ? '✗ Salah' : '✗ Tidak dijawab' });
@@ -110,9 +124,15 @@
       ? senaraiSemakan(quiz, r.results, order, optOrder)
       : el('div', { class: 'notice', id: 'nota-jawapan', text: 'Jawapan betul akan dipaparkan selepas kuiz ditutup' +
         (r.tutup ? ' pada ' + tarikh(r.tutup) : '') + '. Lihat semula di muka depan → "Lihat jawapan".' });
+    const sorak = r.pct === 100 ? 'Sempurna! Anda juara Matematik! 🏆' : r.pct >= 80 ? 'Cemerlang! Teruskan! 🎉'
+      : r.pct >= 60 ? 'Bagus! Sikit lagi nak cemerlang! 💪' : r.pct >= 40 ? 'Boleh tahan! Ulang kaji dan cuba lagi 📚'
+      : 'Jangan putus asa – setiap cubaan buat anda lebih hebat! 🌱';
+    const kad = kadMarkah(r, quiz.title);
+    kad.prepend(el('div', { class: 'sorak' }, maskot('besar'), el('b', { text: sorak })));
     show(el('div', { class: 'notice', style: 'background:var(--ok-bg);color:var(--ok)', text: '✓ Jawapan anda telah dihantar dan direkodkan.' }),
-      kadMarkah(r, quiz.title), actions, banding, jawapan);
+      kad, actions, banding, jawapan);
     window.scrollTo(0, 0);
+    if (r.pct >= 80) konfeti();
   }
 
   /* ================= Semakan selepas kuiz ditutup ================= */
@@ -150,7 +170,7 @@
     // Susunan soalan & pilihan dirawakkan bagi setiap murid dan cubaan (jawapan tetap dihantar ikut susunan asal).
     const seed = quizId + '|' + s.id + '|' + st.attempt;
     const order = shuffle(n, seed);
-    const optOrder = quiz.questions.map((_, i) => shuffle(4, seed + '|' + i));
+    const optOrder = quiz.questions.map((q, i) => susunPilihan(q, shuffle(4, seed + '|' + i)));
     if (st.finished) return keputusan(st, quiz, order, optOrder);
 
     let ans = Array.from({ length: n }, (_, i) => (st.answers || [])[i] || '');
@@ -276,10 +296,10 @@
       if (pos >= n) return lukisRingkasan();
       const i = order[pos];
       const q = quiz.questions[i];
-      const opts = el('div', { class: 'opts', role: 'radiogroup', 'aria-label': 'Pilihan jawapan' });
+      const opts = el('div', { class: 'opts' + (hurufSahaja(q) ? ' huruf' : ''), role: 'radiogroup', 'aria-label': 'Pilihan jawapan' });
       optOrder[i].forEach((o, j) => {
-        const b = el('button', { class: 'opt', type: 'button', role: 'radio', 'aria-checked': String(ans[i] === L[o]), 'data-l': L[j] },
-          el('span', { class: 'L', text: L[j] }), el('span', { class: 'T', text: q.options[o] }));
+        const b = el('button', { class: 'opt', type: 'button', role: 'radio', 'aria-checked': String(ans[i] === L[o]),
+          'data-l': L[j], 'aria-label': hurufSahaja(q) ? 'Pilihan ' + hurufPilihan(q.options[o]) : null }, isiPilihan(q, o, j));
         b.addEventListener('click', () => {
           if (tamat || hantarSedang) return;
           ans[i] = ans[i] === L[o] ? '' : L[o]; // tekan sekali lagi untuk batal

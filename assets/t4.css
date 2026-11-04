@@ -214,3 +214,150 @@ details.rakan { margin-top: 12px; border-top: 1px dashed var(--line); padding-to
 details.rakan summary { cursor: pointer; font-weight: 600; font-size: .92rem; color: var(--pri-d); min-height: 32px; }
 details.rakan .names { margin: 6px 0; }
 p.rakan { margin-top: 12px; }
+
+/* =====================================================================
+   TEMA MURID: kartun Matematik berwarna (body.murid).
+   Kad soalan (#kad) kekal hitam putih supaya soalan mudah dibaca.
+   ===================================================================== */
+body.murid {
+  --pri: #6C3CF0;
+  --pri-d: #5527d6;
+  --pri-bg: #efe8ff;
+  --sun: #FFD84D;
+  --coral: #FF6B6B;
+  --mint: #2EC4B6;
+  --sky: #4D7CFE;
+  --orange: #FF9F1C;
+  --pink: #FF8FB1;
+  --ink: #241b3a;
+  --muted: #6b6185;
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background-color: #fdf6ff;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' font-family='Arial,sans-serif' font-weight='700'%3E%3Ctext x='18' y='42' font-size='34' fill='%23FF6B6B' opacity='.22'%3E%2B%3C/text%3E%3Ctext x='118' y='58' font-size='30' fill='%234D7CFE' opacity='.22'%3E%C3%97%3C/text%3E%3Ctext x='170' y='128' font-size='34' fill='%232EC4B6' opacity='.24'%3E%CF%80%3C/text%3E%3Ctext x='52' y='118' font-size='30' fill='%23FF9F1C' opacity='.24'%3E%C3%B7%3C/text%3E%3Ctext x='20' y='196' font-size='30' fill='%23B15CFF' opacity='.22'%3E%E2%88%9A%3C/text%3E%3Ctext x='112' y='190' font-size='32' fill='%23FF8FB1' opacity='.26'%3E%3D%3C/text%3E%3Ctext x='176' y='36' font-size='22' fill='%236C3CF0' opacity='.18'%3E%25%3C/text%3E%3Ccircle cx='100' cy='150' r='7' fill='none' stroke='%23FFB020' stroke-width='3' opacity='.25'/%3E%3Cpath d='M190 190 l12 -20 l12 20z' fill='none' stroke='%232EC4B6' stroke-width='3' opacity='.25'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #f3ecff 0%, #fff7ec 60%, #eafaf7 100%);
+  background-attachment: scroll, fixed;
+}
+body.murid h1, body.murid h2, body.murid h3, body.murid .btn, body.murid .brand, body.murid .qno,
+body.murid .pick button, body.murid .badge, body.murid .score .big, body.murid .gred, body.murid .timer {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-weight: 600;
+}
+
+/* Bar atas berwarna dengan gelombang */
+body.murid .topbar {
+  position: relative; padding: 12px 16px 22px;
+  background: linear-gradient(110deg, #6C3CF0 0%, #4D7CFE 55%, #2EC4B6 100%);
+}
+body.murid .topbar::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 14px;
+  background: radial-gradient(14px 10px at 14px 0, transparent 96%, #fdf6ff) 0 0 / 28px 14px repeat-x;
+}
+body.murid .topbar .brand { font-size: 1.1rem; text-shadow: 0 2px 0 rgba(0, 0, 0, .15); }
+body.murid .topbar .brand { font-size: 1rem; line-height: 1.25; overflow-wrap: anywhere; }
+body.murid .topbar .brand small { font-family: 'Nunito', system-ui, sans-serif; font-weight: 700; text-shadow: none; margin-top: 2px; }
+.maskot { display: inline-block; flex: none; line-height: 0; }
+.maskot svg { width: 100%; height: 100%; }
+.maskot.kecil { width: 40px; height: 40px; animation: goyang 3s ease-in-out infinite; }
+.maskot.besar { width: 96px; height: 96px; animation: lompat 2.4s ease-in-out infinite; }
+@keyframes goyang { 50% { transform: rotate(-8deg); } }
+@keyframes lompat { 50% { transform: translateY(-8px) rotate(4deg); } }
+
+/* Kad umum: bulat, bayang berwarna */
+body.murid .card { border-radius: 20px; box-shadow: 0 6px 0 rgba(108, 60, 240, .10), 0 12px 28px rgba(77, 124, 254, .12); }
+body.murid .section-title {
+  display: inline-block; margin: 22px 0 0; padding: 4px 14px; border-radius: 999px;
+  background: var(--sun); color: var(--ink); letter-spacing: .02em; font-family: 'Fredoka', sans-serif;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, .08); transform: rotate(-1.5deg);
+}
+
+/* Butang ceria dengan bayang 3D */
+body.murid .btn {
+  border-radius: 14px; background: var(--orange); color: #2b1600; box-shadow: 0 4px 0 #d97e00;
+  transition: transform .08s, box-shadow .08s;
+}
+body.murid .btn:hover { background: #ffad3d; }
+body.murid .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #d97e00; }
+body.murid .btn.ghost { background: #fff; color: var(--pri-d); box-shadow: 0 4px 0 #d9ccff; border: 2px solid #d9ccff; }
+body.murid .btn.ghost:hover { background: var(--pri-bg); }
+body.murid .btn.ok { background: var(--mint); color: #062b27; box-shadow: 0 4px 0 #1f9a8f; }
+body.murid .btn:disabled { box-shadow: none; transform: none; }
+
+/* Sambutan */
+.sambut { display: flex; align-items: center; gap: 14px; }
+.sambut h1 { margin: 0 0 4px; font-size: 1.45rem; color: var(--pri-d); }
+.sambut p { margin: 0; color: var(--muted); }
+body.murid .card.sambut { background: linear-gradient(120deg, #fff 0%, #fff6d6 100%); border: 3px solid #ffe28a; }
+
+/* Log masuk: butang kelas pelbagai warna */
+body.murid .pick:not(.names) button { border: 0; color: #fff; font-size: 1.05rem; box-shadow: 0 4px 0 rgba(0, 0, 0, .15); text-align: center; }
+body.murid .pick:not(.names) button:nth-child(5n+1) { background: var(--coral); }
+body.murid .pick:not(.names) button:nth-child(5n+2) { background: var(--sky); }
+body.murid .pick:not(.names) button:nth-child(5n+3) { background: var(--mint); }
+body.murid .pick:not(.names) button:nth-child(5n+4) { background: var(--orange); color: #2b1600; }
+body.murid .pick:not(.names) button:nth-child(5n) { background: #B15CFF; }
+body.murid .pick.names button { border-radius: 14px; border: 2px solid #e5dcff; }
+body.murid .steps span.on { background: linear-gradient(90deg, var(--coral), var(--orange), var(--mint)); }
+
+/* Kad kuiz di muka depan: jalur warna di kiri */
+body.murid .qcard { border-left: 10px solid var(--sky); }
+body.murid .qcard:nth-of-type(4n+2) { border-left-color: var(--coral); }
+body.murid .qcard:nth-of-type(4n+3) { border-left-color: var(--mint); }
+body.murid .qcard:nth-of-type(4n) { border-left-color: var(--orange); }
+body.murid .chip { background: var(--pri-bg); border-color: #d9ccff; color: var(--pri-d); font-weight: 700; }
+
+/* Bar kemajuan pelangi + pemasa */
+body.murid .qbar { background: rgba(255, 255, 255, .94); backdrop-filter: blur(4px); border-bottom: 3px solid #efe8ff; }
+body.murid .progress { height: 12px; border-radius: 6px; background: #eee8ff; }
+body.murid .progress i {
+  background: linear-gradient(90deg, #FF6B6B, #FF9F1C, #FFD84D, #2EC4B6, #4D7CFE, #6C3CF0);
+}
+body.murid .timer { background: var(--sun); color: #3a2a00; box-shadow: 0 3px 0 #e0b400; }
+body.murid .timer.low { background: var(--coral); color: #fff; box-shadow: 0 3px 0 #c94444; animation: denyut 1s ease-in-out infinite; }
+@keyframes denyut { 50% { transform: scale(1.08); } }
+body.murid .grid-no button { border-radius: 12px; border: 2px solid #e5dcff; }
+body.murid .grid-no button.done { background: var(--mint); border-color: var(--mint); color: #fff; }
+
+/* ---------- KAD SOALAN: HITAM PUTIH ---------- */
+body.murid #kad, body.murid #semakan .rv {
+  background: #fff; color: #111; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+body.murid #kad { border: 3px solid #111; box-shadow: 6px 6px 0 #111; border-radius: 16px; }
+body.murid #kad .qno { color: #111; font-family: system-ui, sans-serif; font-weight: 800; }
+body.murid #kad .qtext { color: #111; }
+body.murid #kad .qimg, body.murid #semakan .qimg { border: 1px solid #111; border-radius: 4px; background: #fff; }
+body.murid #kad .opt { border: 2px solid #111; border-radius: 12px; background: #fff; color: #111; }
+body.murid #kad .opt .L { background: #fff; color: #111; border: 2px solid #111; }
+body.murid #kad .opt:hover { background: #f2f2f2; }
+body.murid #kad .opt[aria-checked="true"] { background: #111; color: #fff; }
+body.murid #kad .opt[aria-checked="true"] .L { background: #fff; color: #111; border-color: #fff; }
+
+/* Pilihan huruf sahaja (pilihan sebenar dalam gambar): 4 butang besar A B C D */
+.opts.huruf { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.opts.huruf .opt { justify-content: center; align-items: center; min-height: 64px; padding: 8px; }
+.opts.huruf .opt .L { width: 44px; height: 44px; font-size: 1.4rem; }
+@media (max-width: 340px) { .opts.huruf { grid-template-columns: repeat(2, 1fr); } }
+
+/* Keputusan */
+body.murid .score { background: linear-gradient(160deg, #fff 0%, #f3ecff 100%); border: 3px solid #d9ccff; }
+body.murid .score .big { color: var(--pri-d); font-size: 3.2rem; }
+body.murid .score .gred { background: var(--sun); color: #3a2a00; box-shadow: 0 3px 0 #e0b400; }
+.sorak { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px; }
+.sorak b { font-family: 'Fredoka', sans-serif; font-size: 1.2rem; color: var(--ink); text-align: left; }
+.konfeti {
+  position: fixed; top: -24px; width: 10px; height: 14px; border-radius: 3px; z-index: 50; pointer-events: none;
+  font: 700 22px 'Fredoka', sans-serif; text-align: center; line-height: 14px;
+  animation: jatuh linear forwards;
+}
+@keyframes jatuh { to { transform: translateY(110vh) rotate(540deg); } }
+
+/* Ranking: pingat & 3 teratas */
+body.murid #ranking tbody tr:nth-child(1):not(.me) td { background: #fff6d6; }
+body.murid #ranking tbody tr:nth-child(2):not(.me) td { background: #f1f3f8; }
+body.murid #ranking tbody tr:nth-child(3):not(.me) td { background: #fff0e6; }
+body.murid tr.me td { background: #e2fbf7; color: #0c4f48; }
+body.murid select.input { border: 2px solid #d9ccff; border-radius: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .maskot, .timer.low, .konfeti { animation: none !important; }
+}

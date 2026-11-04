@@ -193,6 +193,10 @@ muncul (banyak gambar), klik Terbitkan sekali lagi: gambar yang siap tidak dimua
 
 Gambar pada **pilihan jawapan** (bukan soalan) tidak disokong; hanya teks pilihan disalin.
 
+**Soalan dalam gambar (Form):** jika teks soalan hanya "Soalan 19" dan soalan sebenar dalam gambar, teks itu
+disembunyikan secara automatik. Jika pilihan jawapan hanya huruf **A, B, C, D** (pilihan sebenar dalam gambar),
+murid nampak 4 butang besar **A B C D** dalam susunan tetap (tidak dirawak) supaya sepadan dengan gambar.
+
 #### Import dari Google Form – gambar tidak disalin
 
 Gambar yang dilekatkan pada soalan dibaca melalui **Google Forms API**. Jika mesej akhir import
@@ -243,6 +247,7 @@ jadi jangan ubah teks soalan di Input Kuiz sebelum menjalankan skrip ini.
    **Murid belum menjawab:** setiap kuiz yang dibuka menunjukkan nama murid **sekelas** yang belum menjawab
    (tekan untuk buka senarai), dengan butang **Salin peringatan** untuk ditampal di WhatsApp kelas.
    Hanya nama murid kelas sendiri dipaparkan; dikemas kini setiap minit.
+   Laman murid menggunakan tema kartun Matematik berwarna (maskot "Si Pi"); kad soalan kekal hitam putih.
 3. **Kuiz:** satu soalan satu kad, bar kemajuan, senarai nombor soalan, pemasa (jika ada).
    Susunan soalan dan pilihan dirawakkan bagi setiap murid. Jawapan disimpan automatik di Sheet (tab Draf),
    jadi murid boleh sambung di telefon lain.

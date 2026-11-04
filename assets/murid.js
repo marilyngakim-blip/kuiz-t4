@@ -1,12 +1,12 @@
 // Muka depan murid: log masuk (Kelas → Nama → PIN) dan senarai kuiz.
 (function () {
-  const { api, el, sesi, tarikh, masa, baki, topbar } = window.T4;
+  const { api, el, sesi, tarikh, masa, baki, topbar, maskot } = window.T4;
   const app = document.getElementById('app');
   const top = document.getElementById('top');
 
   function setTop(right) {
     top.innerHTML = '';
-    top.append(topbar('📐 Kuiz Matematik Tingkatan 4', null, right));
+    top.append(topbar('Kuiz Matematik Tingkatan 4', null, right));
   }
 
   function show(...nodes) {
@@ -32,7 +32,9 @@
     const r = await api('classes');
     if (!r || !r.ok) return show(errorCard((r && r.error) || 'Ralat.', pilihKelas));
     const box = el('div', { class: 'pick' }, r.kelas.map(k => el('button', { type: 'button', text: k, onclick: () => pilihNama(k) })));
-    show(el('div', { class: 'card' }, steps(1), el('h1', { text: 'Log masuk' }),
+    show(el('div', { class: 'card sambut' }, maskot('besar'),
+      el('div', {}, el('h1', { text: 'Jom Kuiz Matematik!' }), el('p', { text: 'Tingkatan 4 · Jawab, semak, naik ranking! 🚀' }))),
+      el('div', { class: 'card' }, steps(1), el('h1', { text: 'Log masuk' }),
       el('p', { class: 'muted', text: 'Langkah 1: pilih kelas anda.' }),
       r.kelas.length ? box : el('p', { class: 'empty', text: 'Tiada kelas. Guru belum memasukkan senarai murid.' })));
   }
@@ -188,7 +190,14 @@
       return show(errorCard((r && r.error) || 'Ralat.', muka));
     }
     const now = r.now || Date.now();
+    const belum = r.buka.filter(q => !q.attempts.length).length;
+    const namaPendek = String(r.nama).split(/\s+(BIN|BINTI|A\/L|A\/P|B\.|BT\.)\s+/i)[0].split(' ').slice(0, 2).join(' ')
+      .toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
     show(
+      el('div', { class: 'card sambut', id: 'sambut' }, maskot('besar'), el('div', {},
+        el('h1', { text: 'Hai, ' + namaPendek + '! 👋' }),
+        el('p', { text: belum ? belum + ' kuiz sedang menunggu anda. Jom cuba! 💪'
+          : r.buka.length ? 'Hebat! Semua kuiz yang dibuka sudah dijawab. 🌟' : 'Tiada kuiz baharu buat masa ini. 😊' }))),
       el('h2', { class: 'section-title', text: 'Kuiz dibuka' }),
       r.buka.length ? el('div', {}, r.buka.map(q => kadKuiz(q, now))) : el('div', { class: 'card empty', text: 'Tiada kuiz dibuka untuk kelas anda sekarang.' }),
       el('div', { class: 'actions' }, el('a', { class: 'btn ghost', href: 'ranking.html?id=semua', text: '🏆 Ranking keseluruhan ' + r.kelas })),
