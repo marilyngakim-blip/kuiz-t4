@@ -1,0 +1,288 @@
+{
+  "id": "kuiz-matematik-t4-bab-2-asas-nombor-part-1",
+  "title": "KUIZ MATEMATIK T4 BAB 2 ASAS NOMBOR (PART 1)",
+  "topik": "",
+  "createdAt": "2026-11-05T14:41:53.519Z",
+  "questions": [
+    {
+      "q": "Antara nombor yang berikut, yang manakah TIDAK mewakili nombor dalam asas enam?",
+      "options": [
+        "142",
+        "245",
+        "317",
+        "425"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi bahawa d ialah satu nombor satu digit. Jika d₈ = d₁₀, nyatakan nilai maksimum yang mungkin bagi d.",
+      "options": [
+        "5",
+        "7",
+        "8",
+        "9"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Nilai tempat bagi digit 0 dalam nombor 4102₅ ialah",
+      "options": [
+        "5",
+        "7",
+        "8",
+        "9"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Nyatakan nilai tempat bagi digit 6 dalam nombor 634₇.",
+      "options": [
+        "319",
+        "294",
+        "49",
+        "42"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Nyatakan nilai, dalam asas sepuluh, bagi digit yang digaris dalam nombor 101̲011₂.\n(Digit yang digaris ialah digit 1 yang ketiga dari kiri.)",
+      "options": [
+        "4",
+        "6",
+        "8",
+        "16"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Nyatakan nilai dalam asas sepuluh bagi digit yang bergaris dalam nombor 1011̲01₂.\n(Digit yang bergaris ialah digit 1 yang keempat dari kiri.)",
+      "options": [
+        "1",
+        "2",
+        "4",
+        "8"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Apakah nilai bagi digit 3, dalam asas sepuluh, bagi nombor 1302₅?",
+      "options": [
+        "25",
+        "75",
+        "125",
+        "375"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Nyatakan nilai digit 4 bagi nombor 340210₅ dalam asas sepuluh.",
+      "options": [
+        "2500",
+        "2000",
+        "625",
+        "125"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Nyatakan nilai digit 5 bagi nombor 1536₈ dalam asas sepuluh.",
+      "options": [
+        "40",
+        "64",
+        "320",
+        "500"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Nyatakan nilai bagi digit 2 dalam nombor 1326₈, dalam asas sepuluh.",
+      "options": [
+        "128",
+        "64",
+        "16",
+        "8"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Tentukan nilai digit bagi setiap digit dalam 317₈, dalam asas sepuluh.\n(Susunan jawapan: digit 3, digit 1, digit 7)",
+      "options": [
+        "Digit 3 = 48, digit 1 = 8, digit 7 = 7",
+        "Digit 3 = 24, digit 1 = 8, digit 7 = 56",
+        "Digit 3 = 64, digit 1 = 8, digit 7 = 1",
+        "Digit 3 = 192, digit 1 = 8, digit 7 = 7"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi nilai digit p, dalam asas sepuluh, bagi nombor 1p03₈ ialah 384. Cari nilai p.",
+      "options": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Nilai bagi digit 6 dalam nombor 361142₈ ialah 6 × 8^m. Nyatakan nilai m.",
+      "options": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Nyatakan nilai bagi digit 2, dalam asas sepuluh, dalam nombor 2134₆.",
+      "options": [
+        "36",
+        "48",
+        "216",
+        "432"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi 3 × 5³ + 4 × 5² + 5y = 3420₅, cari nilai y.",
+      "options": [
+        "0",
+        "2",
+        "3",
+        "4"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi bahawa 1001₂ = 1 × 8ⁿ + 1. Cari nilai n.",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi 101000010₂ = 2^(x + 3) + 2⁶ + 2. Cari nilai x.",
+      "options": [
+        "5",
+        "6",
+        "8",
+        "9"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi bahawa 3 × 5³ + 5² + y = 3102₅, cari nilai y.",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi 2301₄ = 2 × 4^p + q × 4² + 1, cari nilai p + q.",
+      "options": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi 1p3₁₀ = 243₈, maka nilai p ialah",
+      "options": [
+        "7",
+        "6",
+        "4",
+        "2"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi 23₅ < x₁₀ < 17₈, cari nilai x.",
+      "options": [
+        "13",
+        "14",
+        "15",
+        "16"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Markah lulus bagi suatu ujian ialah 40₁₀ markah. Justine memperoleh 100ₙ markah tetapi gagal dalam ujian itu. Nyatakan nilai maksimum bagi n.",
+      "options": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Clvin mempunyai sebuah peti besi berkata laluan. Setelah Clvin mengahwini Gracie, dia memaklumkan kepada Gracie bahawa kata laluan peti tersebut ialah tarikh lahirnya, 6 Ogos. Apakah kata laluan itu?",
+      "options": [
+        "1526₈",
+        "4413₇",
+        "2452₆",
+        "1140₅"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Tukarkan 200 kepada satu nombor dalam asas lima.",
+      "options": [
+        "13₅",
+        "130₅",
+        "1300₅",
+        "13000₅"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi bahawa 1m11₅ = 181₁₀, cari nilai m.",
+      "options": [
+        "0",
+        "2",
+        "3",
+        "4"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "SRP ialah suatu nombor dalam asas lima. Jika SRP = 82₁₀, cari digit R.",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi bahawa 1p36₇ = 468₁₀. Cari nilai p.",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "marks": 1
+    },
+    {
+      "q": "Diberi ketinggian Menara Kuala Lumpur ialah 421 meter. Tukarkan 421₁₀ kepada asas tujuh.",
+      "options": [
+        "1141₇",
+        "1411₇",
+        "1114₇",
+        "4111₇"
+      ],
+      "marks": 1
+    }
+  ]
+}
