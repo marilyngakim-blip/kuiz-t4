@@ -70,7 +70,7 @@ async function startServer(opts = {}) {
   const base = 'http://127.0.0.1:' + webPort + '/';
   const apiUrl = 'http://127.0.0.1:' + apiPort + '/exec';
   Object.assign(gas.props, {
-    GURU_PASSWORD: 'guru123', GITHUB_TOKEN: 'token-palsu', GITHUB_REPO: 'marilyngakim-blip/kuiz-t4',
+    GURU_PASSWORD: 'guru123', GITHUB_TOKEN: 'token-palsu', GITHUB_REPO: 'smklangkon/kuiz-t4',
     WEBAPP_URL: apiUrl, PAGES_URL: base
   });
   return {

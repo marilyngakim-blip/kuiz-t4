@@ -79,7 +79,8 @@
     const d = new Date(ms);
     let h = d.getHours();
     const m = String(d.getMinutes()).padStart(2, '0');
-    const ap = h < 12 ? 'pg' : 'ptg';
+    // Waktu dalam BM: pagi (12:00–11:59 pg), tengah hari (12–1:59), petang (2–6:59), malam (7–11:59).
+    const ap = h < 12 ? 'pg' : h < 14 ? 'tgh hari' : h < 19 ? 'ptg' : 'mlm';
     h = h % 12 || 12;
     return HARI[d.getDay()] + ', ' + d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear() + ', ' + h + ':' + m + ' ' + ap;
   }

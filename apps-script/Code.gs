@@ -19,10 +19,10 @@
  * Script properties (Project Settings → Script properties):
  *   GURU_PASSWORD = kata laluan laman guru (guru.html)
  *   GITHUB_TOKEN  = token GitHub (Contents: Read and write, repo ini sahaja)
- *   GITHUB_REPO   = marilyngakim-blip/kuiz-t4
+ *   GITHUB_REPO   = smklangkon/kuiz-t4
  *   WEBAPP_URL    = URL Web App (/exec) selepas Deploy
  *   GITHUB_BRANCH = main  (pilihan)
- *   PAGES_URL     = https://marilyngakim-blip.github.io/kuiz-t4/  (pilihan)
+ *   PAGES_URL     = https://smklangkon.github.io/kuiz-t4/  (pilihan)
  *   SESSION_SECRET dijana sendiri oleh skrip – jangan ubah (jika diubah, semua murid perlu log masuk semula).
  */
 
@@ -1612,7 +1612,7 @@ function simpanGambarDrive_(blob, name) {
 
 function repo_() {
   const repo = (PropertiesService.getScriptProperties().getProperty('GITHUB_REPO') || '').trim();
-  if (!/^[^/\s]+\/[^/\s]+$/.test(repo)) throw new Error('Script property GITHUB_REPO belum diisi (contoh: marilyngakim-blip/kuiz-t4).');
+  if (!/^[^/\s]+\/[^/\s]+$/.test(repo)) throw new Error('Script property GITHUB_REPO belum diisi (contoh: smklangkon/kuiz-t4).');
   return repo;
 }
 

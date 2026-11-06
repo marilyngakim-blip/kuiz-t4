@@ -76,6 +76,7 @@ Kata laluan ini untuk laman `guru.html`. Ia hanya disimpan dalam Script properti
 2. Isi:
    - Token name: `Kuiz T4`
    - Expiration: 1 tahun (tetapkan peringatan untuk menjana semula)
+   - Resource owner: **smklangkon** (organisasi pemilik repo)
    - Repository access: **Only select repositories → kuiz-t4**
    - Permissions → Repository permissions → **Contents: Read and write** (yang lain biarkan)
 3. **Generate token** → salin token (hanya dipaparkan sekali).
@@ -84,7 +85,7 @@ Kata laluan ini untuk laman `guru.html`. Ia hanya disimpan dalam Script properti
 | Property | Nilai |
 |---|---|
 | `GITHUB_TOKEN` | token tadi |
-| `GITHUB_REPO` | `marilyngakim-blip/kuiz-t4` |
+| `GITHUB_REPO` | `smklangkon/kuiz-t4` |
 
 Jangan kongsi token, Script properties atau Sheet ini dengan murid.
 
@@ -94,8 +95,8 @@ Jangan kongsi token, Script properties atau Sheet ini dengan murid.
 2. Source: *Deploy from a branch* → Branch **main**, folder **/ (root)** → **Save**.
 3. Tunggu ±1 minit.
 
-Laman murid: `https://marilyngakim-blip.github.io/kuiz-t4/`
-Laman guru: `https://marilyngakim-blip.github.io/kuiz-t4/guru.html`
+Laman murid: `https://smklangkon.github.io/kuiz-t4/`
+Laman guru: `https://smklangkon.github.io/kuiz-t4/guru.html`
 
 Repo mesti **Public** (akaun GitHub percuma). Hanya soalan yang berada di repo; jawapan dan senarai murid
 kekal dalam Google Sheet.
