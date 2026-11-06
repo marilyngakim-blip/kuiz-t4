@@ -22,7 +22,7 @@
 
   function setTop(right) {
     top.innerHTML = '';
-    top.append(window.T4.topbar('📊 Laman Guru – Kuiz Matematik T4', null, right));
+    top.append(window.T4.topbar('📊 Laman Guru – Kuiz Ulangkaji Matematik T4', null, right));
   }
 
   /* ---------------- Log masuk ---------------- */

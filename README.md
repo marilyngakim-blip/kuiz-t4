@@ -1,4 +1,4 @@
-# Kuiz Matematik Tingkatan 4 – Panduan Guru
+# Kuiz Ulangkaji Matematik Tingkatan 4 – Panduan Guru
 
 Sistem kuiz dalam talian untuk murid Tingkatan 4. Murid log masuk dengan **Kelas → Nama → PIN** (PIN pilihan) di telefon,
 menjawab kuiz, dan melihat ranking kelas. Guru melihat papan pemuka, senarai murid yang belum menjawab,

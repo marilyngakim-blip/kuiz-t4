@@ -6,7 +6,7 @@
 
   function setTop(right) {
     top.innerHTML = '';
-    top.append(topbar('Kuiz Matematik Tingkatan 4', null, right));
+    top.append(topbar('Kuiz Ulangkaji Matematik Tingkatan 4', null, right));
   }
 
   function show(...nodes) {
@@ -33,7 +33,7 @@
     if (!r || !r.ok) return show(errorCard((r && r.error) || 'Ralat.', pilihKelas));
     const box = el('div', { class: 'pick' }, r.kelas.map(k => el('button', { type: 'button', text: k, onclick: () => pilihNama(k) })));
     show(el('div', { class: 'card sambut' }, maskot('besar'),
-      el('div', {}, el('h1', { text: 'Jom Kuiz Matematik!' }), el('p', { text: 'Tingkatan 4 · Jawab, semak, naik ranking! 🚀' }))),
+      el('div', {}, el('h1', { text: 'Kuiz Ulangkaji Matematik Tingkatan 4' }), el('p', { text: 'Jom jawab, semak dan naik ranking! 🚀' }))),
       el('div', { class: 'card' }, steps(1), el('h1', { text: 'Log masuk' }),
       el('p', { class: 'muted', text: 'Langkah 1: pilih kelas anda.' }),
       r.kelas.length ? box : el('p', { class: 'empty', text: 'Tiada kelas. Guru belum memasukkan senarai murid.' })));
