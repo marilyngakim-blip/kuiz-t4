@@ -754,7 +754,9 @@ function guruLogin_(req) {
     return { ok: false, error: 'Kata laluan salah.' };
   }
   c.remove('gurufail');
-  return { ok: true, token: tandatangan_({ r: 'g', p: hmac_('guru:' + pass).slice(0, 10), e: Date.now() + 12 * 3600e3 }) };
+  // "Kekal log masuk": 30 hari; jika tidak, 12 jam. Token tamat serta-merta jika GURU_PASSWORD ditukar.
+  const tempoh = req.ingat ? 30 * 864e5 : 12 * 3600e3;
+  return { ok: true, token: tandatangan_({ r: 'g', p: hmac_('guru:' + pass).slice(0, 10), e: Date.now() + tempoh }) };
 }
 
 function guru_(req) {

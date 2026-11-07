@@ -132,6 +132,51 @@ const { langkah, selesai, ralatKonsol } = require('./alat');
     await p.screenshot({ path: srv.outDir + '/3-telefon.png', fullPage: true });
   });
 
+  await langkah('3h. Kekal log masuk: tutup pelayar & buka semula tanpa kata laluan; tidak ditanda = tamat', async () => {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    let p = await ctx.newPage();
+    await p.goto(base + 'guru.html');
+    assert.strictEqual(await p.locator('#kekal').isChecked(), true, 'ditanda secara lalai');
+    await p.fill('#kata-laluan', 'guru123');
+    await p.getByRole('button', { name: 'Masuk' }).click();
+    await p.locator('[data-quiz]').first().waitFor();
+    await p.close();                                   // tutup tab
+    p = await ctx.newPage();                           // buka semula
+    await p.goto(base + 'guru.html');
+    await p.locator('[data-quiz]').first().waitFor();
+    assert.strictEqual(await p.locator('#kata-laluan').count(), 0, 'tidak perlu kata laluan');
+    // Token kekal sah selepas 13 jam (30 hari), tetapi bukan selepas 31 hari
+    const tok = await p.evaluate(() => localStorage.getItem('t4.guru'));
+    g.advance(13 * 3600e3);
+    assert.strictEqual(g.post({ action: 'guruDashboard', token: tok }).ok, true);
+    g.advance(31 * 864e5);
+    assert.strictEqual(g.post({ action: 'guruDashboard', token: tok }).auth, true);
+    // Log keluar membuang sesi
+    await p.reload();
+    await p.locator('#kata-laluan').waitFor();       // token tamat → minta kata laluan semula
+    // Tidak ditanda: tamat bila tab ditutup, token 12 jam sahaja
+    await p.uncheck('#kekal');
+    await p.fill('#kata-laluan', 'guru123');
+    await p.getByRole('button', { name: 'Masuk' }).click();
+    await p.locator('[data-quiz]').first().waitFor();
+    assert.strictEqual(await p.evaluate(() => localStorage.getItem('t4.guru')), null);
+    const tok2 = await p.evaluate(() => sessionStorage.getItem('t4.guru'));
+    g.advance(13 * 3600e3);
+    assert.strictEqual(g.post({ action: 'guruDashboard', token: tok2 }).auth, true, '12 jam');
+    await p.close();
+    p = await ctx.newPage();
+    await p.goto(base + 'guru.html');
+    await p.locator('#kata-laluan').waitFor();
+    // Log keluar
+    await p.fill('#kata-laluan', 'guru123');
+    await p.getByRole('button', { name: 'Masuk' }).click();
+    await p.locator('[data-quiz]').first().waitFor();
+    await p.getByRole('button', { name: 'Log keluar' }).click();
+    await p.locator('#kata-laluan').waitFor();
+    assert.strictEqual(await p.evaluate(() => localStorage.getItem('t4.guru') || sessionStorage.getItem('t4.guru')), null);
+    await ctx.close();
+  });
+
   assert.deepStrictEqual(errors, [], errors.join('\n'));
   console.log('Tangkapan skrin: ' + srv.outDir);
   await browser.close();

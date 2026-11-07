@@ -36,7 +36,9 @@
         const json = await res.json();
         if (json && json.retry && i < tries - 1) { last = json; continue; }
         if (json && json.auth && !opts.keepAuth) {
-          if (opts.guru) { try { sessionStorage.removeItem('t4.guru'); } catch (e) { /* abaikan */ } }
+          if (opts.guru) {
+            try { sessionStorage.removeItem('t4.guru'); localStorage.removeItem('t4.guru'); } catch (e) { /* abaikan */ }
+          }
           else sesi.clear();
         }
         return json;

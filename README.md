@@ -268,6 +268,10 @@ jadi jangan ubah teks soalan di Input Kuiz sebelum menjalankan skrip ini.
 | Analisis item | % betul setiap soalan, bilangan murid memilih A/B/C/D, pengganggu paling kerap. Soalan < 50% ditanda |
 | Muat turun CSV | Semua cubaan (satu kuiz atau semua) untuk Excel |
 
+**Kekal log masuk:** semasa log masuk, kotak *Kekal log masuk di peranti ini* ditanda secara lalai. Guru kekal
+log masuk selama 30 hari walaupun pelayar ditutup. Buang tanda pada komputer bersama (sesi tamat bila pelayar
+ditutup). **Log keluar** atau menukar `GURU_PASSWORD` menamatkan sesi serta-merta.
+
 Huruf A–D dalam analisis item mengikut susunan asal di Sheet, walaupun murid melihat pilihan dalam susunan rawak.
 
 Skala gred: A+ 90–100, A 80–89, A- 70–79, B+ 65–69, B 60–64, C+ 55–59, C 50–54, D 45–49, E 40–44, G 0–39.

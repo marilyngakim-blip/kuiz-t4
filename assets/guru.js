@@ -4,10 +4,22 @@
   const app = document.getElementById('app');
   const top = document.getElementById('top');
   const GRED = ['A+', 'A', 'A-', 'B+', 'B', 'C+', 'C', 'D', 'E', 'G'];
+  // Sesi guru: localStorage = kekal walaupun pelayar ditutup ("Kekal log masuk");
+  // sessionStorage = tamat bila pelayar ditutup (komputer bersama).
   const ss = {
-    get() { try { return sessionStorage.getItem('t4.guru'); } catch (e) { return null; } },
-    set(v) { try { sessionStorage.setItem('t4.guru', v); } catch (e) { /* abaikan */ } },
-    del() { try { sessionStorage.removeItem('t4.guru'); } catch (e) { /* abaikan */ } }
+    get() {
+      try { return localStorage.getItem('t4.guru') || sessionStorage.getItem('t4.guru'); } catch (e) { return null; }
+    },
+    set(v, kekal) {
+      try {
+        this.del();
+        (kekal ? localStorage : sessionStorage).setItem('t4.guru', v);
+      } catch (e) { /* abaikan */ }
+    },
+    del() {
+      try { localStorage.removeItem('t4.guru'); } catch (e) { /* abaikan */ }
+      try { sessionStorage.removeItem('t4.guru'); } catch (e) { /* abaikan */ }
+    }
   };
   let dash = null;
   let tab = 'dash';
@@ -31,14 +43,19 @@
     const pass = el('input', { class: 'input', type: 'password', id: 'kata-laluan', autocomplete: 'current-password' });
     const msg = el('p', { class: 'error', role: 'alert' });
     const btn = el('button', { class: 'btn block', type: 'submit', text: 'Masuk' });
-    const form = el('form', {}, el('label', { class: 'field' }, el('span', { text: 'Kata laluan guru' }), pass), msg, btn);
+    const ingat = el('input', { type: 'checkbox', id: 'kekal', checked: true });
+    const form = el('form', {}, el('label', { class: 'field' }, el('span', { text: 'Kata laluan guru' }), pass),
+      el('label', { class: 'kekal' }, ingat, el('span', {},
+        el('b', { text: 'Kekal log masuk di peranti ini' }),
+        el('small', { class: 'muted', text: ' (30 hari). Jangan tanda pada komputer bersama.' }))),
+      msg, btn);
     form.addEventListener('submit', async ev => {
       ev.preventDefault();
       btn.disabled = true;
-      const r = await api('guruLogin', { password: pass.value });
+      const r = await api('guruLogin', { password: pass.value, ingat: ingat.checked });
       btn.disabled = false;
       if (!r || !r.ok) { msg.textContent = (r && r.error) || 'Ralat.'; return; }
-      ss.set(r.token);
+      ss.set(r.token, ingat.checked);
       mula();
     });
     app.innerHTML = '';

@@ -361,3 +361,7 @@ body.murid select.input { border: 2px solid #d9ccff; border-radius: 14px; }
 @media (prefers-reduced-motion: reduce) {
   .maskot, .timer.low, .konfeti { animation: none !important; }
 }
+
+/* Laman guru: pilihan kekal log masuk */
+label.kekal { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 12px; cursor: pointer; font-size: .92rem; }
+label.kekal input { width: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: var(--pri); }
